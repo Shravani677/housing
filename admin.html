@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahindra Gardens – Admin Panel</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F4F5EC; color: #111; display: flex; min-height: 100vh; }
+    .sidebar { width: 220px; background: #fff; border-right: 1px solid #E0E1D8; padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+    .sidebar-logo-icon { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+    .sidebar-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .sidebar-logo h2 { font-size: 15px; font-weight: 700; color: #111; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .sidebar-nav a { padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #666; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
+    .sidebar-nav a:hover { background: #F4F5EC; color: #111; }
+    .sidebar-nav a.active { background: #1E4D31; color: #fff; }
+    .sidebar-footer { padding-top: 16px; border-top: 1px solid #E0E1D8; }
+    .user-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1E4D31; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+    .user-meta { line-height: 1.3; }
+    .user-meta .name { font-size: 12px; font-weight: 600; color: #111; }
+    .user-meta .role { font-size: 10px; color: #666; text-transform: capitalize; }
+    .btn-logout { width: 100%; padding: 8px; background: transparent; border: 1px solid #E0E1D8; border-radius: 50px; color: #666; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-logout:hover { border-color: #1E4D31; color: #1E4D31; }
+    .main { flex: 1; padding: 28px 32px; max-width: calc(100vw - 220px); }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 22px; font-weight: 800; color: #111; }
+    .page-header p { font-size: 13px; color: #666; margin-top: 4px; }
+    .card { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-header h3 { font-size: 15px; font-weight: 700; color: #111; }
+    .btn { padding: 8px 18px; background: #1E4D31; border: none; border-radius: 50px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn:hover { background: #163d27; transform: translateY(-1px); }
+    .btn-sm { padding: 5px 14px; font-size: 11px; }
+    .btn-danger { background: #DC2626; }
+    .btn-danger:hover { background: #B91C1C; }
+    .btn-outline { background: transparent; border: 1px solid #E0E1D8; color: #666; }
+    .btn-outline:hover { background: #F4F5EC; border-color: #1E4D31; color: #1E4D31; }
+    .complaint-desc { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.5; }
+    .complaint-meta { font-size: 11px; color: #999; margin-top: 3px; }
+    .resolution-text { font-size: 12px; color: #15803D; margin-top: 4px; padding: 6px 10px; background: #F0FDF4; border-radius: 8px; }
+    .badge { font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; display: inline-block; }
+    .badge-open { background: #FEF2F2; color: #B91C1C; }
+    .badge-in_progress { background: #FFFBEB; color: #A16207; }
+    .badge-resolved { background: #F0FDF4; color: #15803D; }
+    .badge-discarded { background: #F3F4F6; color: #6B7280; }
+    .btn-warning { background: #D97706; }
+    .btn-warning:hover { background: #B45309; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 14px; color: #666; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #E0E1D8; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F1E8; color: #111; }
+    td .actions { display: flex; gap: 6px; }
+    .empty-state { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 28px; width: 480px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
+    .modal h3 { font-size: 17px; font-weight: 700; color: #111; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; background: #F8F9F2; border: 1px solid #E0E1D8; border-radius: 12px; color: #111; font-size: 14px; outline: none; transition: all 0.2s; font-family: inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1E4D31; background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-group select { cursor: pointer; }
+    .form-group select option { background: #fff; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .message { padding: 10px 14px; border-radius: 12px; font-size: 13px; display: none; margin-bottom: 12px; }
+    .message.error { display: block; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
+    .message.success { display: block; background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
+    .mt-filters { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; }
+    .mt-filters .form-group { margin-bottom: 0; min-width: 140px; }
+    .mt-summary { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .mt-summary-item { flex: 1; min-width: 120px; background: #F4F5EC; border-radius: 12px; padding: 16px; text-align: center; }
+    .mt-summary-num { font-size: 24px; font-weight: 800; color: #111; }
+    .mt-summary-label { font-size: 11px; color: #666; margin-top: 2px; }
+    .mt-bulk-bar { display: flex; gap: 12px; align-items: flex-end; padding: 16px; background: #F8F9F2; border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .mt-bulk-bar .form-group { margin-bottom: 0; min-width: 120px; }
+    .notice-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid #F0F1E8; }
+    .notice-item:last-child { border-bottom: none; }
+    .notice-item-inner { flex: 1; }
+    .notice-item-title { font-size: 14px; font-weight: 600; color: #111; }
+    .notice-item-content { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.5; }
+    .notice-item-meta { font-size: 11px; color: #999; margin-top: 5px; }
+    .notice-item-actions { display: flex; gap: 6px; margin-left: 16px; }
+    @media (max-width: 768px) { .sidebar { width: 60px; padding: 16px 8px; } .sidebar-logo h2, .sidebar-nav a span, .user-meta, .btn-logout { display: none; } .main { max-width: calc(100vw - 60px); padding: 16px; } }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="logo.jpg" alt="MG"></div>
+      <h2>Admin Panel</h2>
+    </div>
+    <div class="sidebar-nav">
+      <a class="active" data-page="residents">&#x1F3E1; <span>Residents</span></a>
+      <a data-page="notices">&#x1F4E2; <span>Notice Board</span></a>
+      <a data-page="events">&#x1F4C5; <span>Events</span></a>
+      <a data-page="complaints">&#x1F4AC; <span>Complaints</span></a>
+      <a data-page="maintenance">&#x1F4B0; <span>Maintenance</span></a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="user-avatar" id="avatarLetter">A</div>
+        <div class="user-meta">
+          <div class="name" id="userName">Admin</div>
+          <div class="role" id="userRole">admin</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page active" id="page-residents">
+      <div class="page-header"><h1>&#x1F3E1; Residents</h1><p>Manage resident information — flat numbers, family members, occupation</p></div>
+      <div class="message" id="residentMsg"></div>
+      <div class="card">
+        <div class="card-header"><h3>All Residents</h3><button class="btn" onclick="openModal('residentModal')">+ Add Resident</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Flat</th><th>Family</th><th>Occupation</th><th>Phone</th><th></th></tr></thead><tbody id="residentTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-notices">
+      <div class="page-header"><h1>&#x1F4E2; Notice Board</h1><p>Add and manage society notices</p></div>
+      <div class="message" id="noticeMsg"></div>
+      <div class="card">
+        <div class="card-header"><h3>All Notices</h3><button class="btn" onclick="openModal('noticeModal')">+ Add Notice</button></div>
+        <div id="noticeList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-events">
+      <div class="page-header"><h1>&#x1F4C5; Events</h1><p>Manage upcoming society events</p></div>
+      <div class="message" id="eventMsg"></div>
+      <div class="card">
+        <div class="card-header"><h3>All Events</h3><button class="btn" onclick="openModal('eventModal')">+ Add Event</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Title</th><th>Date</th><th>Venue</th><th></th></tr></thead><tbody id="eventTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-complaints">
+      <div class="page-header"><h1>&#x1F4AC; Complaints</h1><p>View and manage resident complaints</p></div>
+      <div class="message" id="complaintMsg"></div>
+      <div class="card">
+        <div class="card-header">
+          <h3>All Complaints</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('all')">All</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('open')">Open</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('in_progress')">Active</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Resident</th><th>Issue</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="complaintTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-maintenance">
+      <div class="page-header"><h1>&#x1F4B0; Maintenance</h1><p>Track and manage resident maintenance payments</p></div>
+      <div class="message" id="mtMsg"></div>
+      <div class="card">
+        <div class="card-header"><h3>Overview</h3></div>
+        <div class="mt-summary" id="mtSummary">
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtTotal">0</div><div class="mt-summary-label">Total Residents</div></div>
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtPaid">0</div><div class="mt-summary-label">Paid</div></div>
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtPending">0</div><div class="mt-summary-label">Pending</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Filter & Bulk Actions</h3></div>
+        <div class="mt-bulk-bar">
+          <div class="form-group"><label>Month</label><select id="mtFilterMonth"></select></div>
+          <div class="form-group"><label>Year</label><select id="mtFilterYear"></select></div>
+          <button class="btn" onclick="loadMaintenanceAdmin()">Apply</button>
+          <button class="btn btn-success" onclick="bulkMarkPaid()">Mark All as Paid</button>
+          <button class="btn btn-outline" onclick="bulkCreateRecords()">Generate Month</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>All Records</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Flat</th><th>Month</th><th>Amount</th><th>Status</th><th>Paid Date</th><th></th></tr></thead><tbody id="mtTable"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="residentModal"><div class="modal">
+    <h3 id="residentModalTitle">Add Resident</h3>
+    <form id="residentForm">
+      <div class="form-group" id="residentUserGroup"><label>User</label><select id="rUser" required></select></div>
+      <div class="form-group"><label>Flat Number</label><input type="text" id="rFlat" placeholder="e.g. A-101" required></div>
+      <div class="form-group"><label>Family Members</label><input type="number" id="rFamily" value="1" min="1"></div>
+      <div class="form-group"><label>Occupation</label><input type="text" id="rOccupation" placeholder="e.g. Engineer, Doctor"></div>
+      <div class="form-group"><label>Phone</label><input type="text" id="rPhone" placeholder="e.g. 9876543210"></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('residentModal')">Cancel</button><button type="submit" class="btn" id="residentSubmit">Save</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="noticeModal"><div class="modal">
+    <h3 id="noticeModalTitle">Add Notice</h3>
+    <form id="noticeForm">
+      <div class="form-group"><label>Title</label><input type="text" id="nTitle" placeholder="Notice title" required></div>
+      <div class="form-group"><label>Content</label><textarea id="nContent" placeholder="Notice content" required></textarea></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('noticeModal')">Cancel</button><button type="submit" class="btn" id="noticeSubmit">Save</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="mtModal"><div class="modal">
+    <h3>Edit Maintenance</h3>
+    <form id="mtForm">
+      <div class="form-group"><label>Status</label><select id="mtEditStatus"><option value="pending">Pending</option><option value="paid">Paid</option></select></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('mtModal')">Cancel</button><button type="submit" class="btn">Save</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="eventModal"><div class="modal">
+    <h3 id="eventModalTitle">Add Event</h3>
+    <form id="eventForm">
+      <div class="form-group"><label>Title</label><input type="text" id="eTitle" placeholder="Event title" required></div>
+      <div class="form-group"><label>Description</label><textarea id="eDesc" placeholder="Event description" required></textarea></div>
+      <div class="form-group"><label>Date</label><input type="date" id="eDate" required></div>
+      <div class="form-group"><label>Venue</label><input type="text" id="eVenue" placeholder="e.g. Community Hall"></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('eventModal')">Cancel</button><button type="submit" class="btn" id="eventSubmit">Save</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="acceptModal"><div class="modal">
+    <h3>Accept Issue</h3>
+    <form id="acceptForm">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">This issue will be marked as <strong>In Progress</strong>.</p>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('acceptModal')">Cancel</button><button type="submit" class="btn btn-warning">Accept Issue</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="discardModal"><div class="modal">
+    <h3>Discard Issue</h3>
+    <form id="discardForm">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">This issue will be marked as <strong>Discarded</strong> (solved or fraudulent). The resident will receive a warning.</p>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('discardModal')">Cancel</button><button type="submit" class="btn btn-danger">Discard Issue</button></div>
+    </form>
+  </div></div>
+
+  <div class="modal-overlay" id="resolveModal"><div class="modal">
+    <h3>Resolve Issue</h3>
+    <form id="resolveForm">
+      <div class="form-group"><label>Describe what was done to solve this issue</label><textarea id="resolutionText" placeholder="Explain the solution..." required></textarea></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('resolveModal')">Cancel</button><button type="submit" class="btn btn-success">Mark Resolved</button></div>
+    </form>
+  </div></div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    let user = null, editId = null;
+
+    function getUser() { const r = sessionStorage.getItem('user'); if (!r) { window.location.href = 'login.html'; return null; } return JSON.parse(r); }
+
+    function init() {
+      user = getUser(); if (!user) return;
+      document.getElementById('avatarLetter').textContent = user.name[0];
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userRole').textContent = user.role;
+      loadResidents(); loadNotices(); loadEvents(); loadComplaints('all'); loadUserSelect(); initMtFilters(); loadMaintenanceAdmin();
+    }
+
+    document.querySelectorAll('.sidebar-nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + a.dataset.page).classList.add('active');
+      });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('user'); window.location.href = 'login.html'; });
+
+    function openModal(id) { editId = null; document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
+
+    async function loadResidents() {
+      const r = await fetch(API + '/residents'); const list = await r.json();
+      document.getElementById('residentTable').innerHTML = list.length
+        ? list.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.flat_number)}</td><td>${r.family_members}</td><td>${esc(r.occupation)}</td><td>${esc(r.phone)}</td><td><div class="actions"><button class="btn btn-sm btn-outline" onclick="editResident(${r.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteResident(${r.id})">Del</button></div></td></tr>`).join('')
+        : '<tr><td colspan="6" class="empty-state">No residents added yet.</td></tr>';
+    }
+
+    async function loadUserSelect() {
+      const r = await fetch(API + '/users?role=resident'); const users = await r.json();
+      document.getElementById('rUser').innerHTML = '<option value="">Select resident user</option>' + users.map(u => `<option value="${u.id}">${esc(u.name)} (${esc(u.email)})</option>`).join('');
+    }
+
+    document.getElementById('residentForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = { user_id: +document.getElementById('rUser').value, flat_number: document.getElementById('rFlat').value, family_members: +document.getElementById('rFamily').value, occupation: document.getElementById('rOccupation').value, phone: document.getElementById('rPhone').value };
+      if (!body.user_id || !body.flat_number) { showMsg('residentMsg', 'Select a user and enter flat number.', 'error'); return; }
+      const res = await fetch(editId ? API + '/residents/' + editId : API + '/residents', { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      showMsg('residentMsg', data.message, data.ok ? 'success' : 'error');
+      if (data.ok) { closeModal('residentModal'); loadResidents(); document.getElementById('residentForm').reset(); }
+    });
+
+    async function editResident(id) {
+      editId = id;
+      const r = await fetch(API + '/residents'); const list = await r.json();
+      const res = list.find(x => x.id === id); if (!res) return;
+      document.getElementById('residentModalTitle').textContent = 'Edit Resident';
+      document.getElementById('residentUserGroup').style.display = 'none';
+      document.getElementById('rFlat').value = res.flat_number;
+      document.getElementById('rFamily').value = res.family_members;
+      document.getElementById('rOccupation').value = res.occupation;
+      document.getElementById('rPhone').value = res.phone;
+      openModal('residentModal');
+    }
+
+    async function deleteResident(id) { if (!confirm('Remove this resident?')) return; const r = await fetch(API + '/residents/' + id, { method: 'DELETE' }); const d = await r.json(); showMsg('residentMsg', d.message, d.ok ? 'success' : 'error'); if (d.ok) loadResidents(); }
+
+    async function loadNotices() {
+      const r = await fetch(API + '/notices'); const list = await r.json();
+      const el = document.getElementById('noticeList');
+      if (!list.length) { el.innerHTML = '<div class="empty-state">No notices yet.</div>'; return; }
+      el.innerHTML = list.map(n =>
+        `<div class="notice-item"><div class="notice-item-inner"><div class="notice-item-title">${esc(n.title)}</div><div class="notice-item-content">${esc(n.content)}</div><div class="notice-item-meta">${n.created_at}</div></div><div class="notice-item-actions"><button class="btn btn-sm btn-outline" onclick="editNotice(${n.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteNotice(${n.id})">Del</button></div></div>`
+      ).join('');
+    }
+
+    document.getElementById('noticeForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = { title: document.getElementById('nTitle').value, content: document.getElementById('nContent').value, posted_by: user.name };
+      if (!body.title || !body.content) { showMsg('noticeMsg', 'All fields required.', 'error'); return; }
+      const res = await fetch(editId ? API + '/notices/' + editId : API + '/notices', { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await res.json();
+      showMsg('noticeMsg', d.message, d.ok ? 'success' : 'error');
+      if (d.ok) { closeModal('noticeModal'); loadNotices(); document.getElementById('noticeForm').reset(); }
+    });
+
+    async function editNotice(id) {
+      editId = id; const r = await fetch(API + '/notices'); const list = await r.json(); const n = list.find(x => x.id === id); if (!n) return;
+      document.getElementById('noticeModalTitle').textContent = 'Edit Notice';
+      document.getElementById('nTitle').value = n.title; document.getElementById('nContent').value = n.content;
+      openModal('noticeModal');
+    }
+
+    async function deleteNotice(id) { if (!confirm('Delete this notice?')) return; const r = await fetch(API + '/notices/' + id, { method: 'DELETE' }); const d = await r.json(); showMsg('noticeMsg', d.message, d.ok ? 'success' : 'error'); if (d.ok) loadNotices(); }
+
+    async function loadEvents() {
+      const r = await fetch(API + '/events/all'); const list = await r.json();
+      document.getElementById('eventTable').innerHTML = list.length
+        ? list.map(e => `<tr><td><strong>${esc(e.title)}</strong><br><span style="font-size:11px;color:#666">${esc(e.description)}</span></td><td>${e.event_date}</td><td>${esc(e.venue)}</td><td><div class="actions"><button class="btn btn-sm btn-outline" onclick="editEvent(${e.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteEvent(${e.id})">Del</button></div></td></tr>`).join('')
+        : '<tr><td colspan="4" class="empty-state">No events.</td></tr>';
+    }
+
+    document.getElementById('eventForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = { title: document.getElementById('eTitle').value, description: document.getElementById('eDesc').value, event_date: document.getElementById('eDate').value, venue: document.getElementById('eVenue').value, posted_by: user.name };
+      if (!body.title || !body.description || !body.event_date) { showMsg('eventMsg', 'All fields required.', 'error'); return; }
+      const res = await fetch(editId ? API + '/events/' + editId : API + '/events', { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await res.json();
+      showMsg('eventMsg', d.message, d.ok ? 'success' : 'error');
+      if (d.ok) { closeModal('eventModal'); loadEvents(); document.getElementById('eventForm').reset(); }
+    });
+
+    async function editEvent(id) {
+      editId = id; const r = await fetch(API + '/events/all'); const list = await r.json(); const e = list.find(x => x.id === id); if (!e) return;
+      document.getElementById('eventModalTitle').textContent = 'Edit Event';
+      document.getElementById('eTitle').value = e.title; document.getElementById('eDesc').value = e.description; document.getElementById('eDate').value = e.event_date; document.getElementById('eVenue').value = e.venue;
+      openModal('eventModal');
+    }
+
+    async function deleteEvent(id) { if (!confirm('Delete this event?')) return; const r = await fetch(API + '/events/' + id, { method: 'DELETE' }); const d = await r.json(); showMsg('eventMsg', d.message, d.ok ? 'success' : 'error'); if (d.ok) loadEvents(); }
+
+    async function loadComplaints(filter) {
+      const r = await fetch(API + '/complaints'); const list = await r.json();
+      const filtered = filter === 'all' ? list : list.filter(c => c.status === filter);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('complaintTable').innerHTML = filtered.length
+        ? filtered.map(c => {
+            const d = new Date(c.created_at + 'Z');
+            const dateStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            let actions = '';
+            if (c.status === 'open') {
+              actions = `<div class="actions">
+                <button class="btn btn-sm btn-warning" onclick="acceptIssue(${c.id})">Accept</button>
+                <button class="btn btn-sm btn-danger" onclick="discardIssue(${c.id})">Discard</button>
+              </div>`;
+            } else if (c.status === 'in_progress') {
+              actions = `<div class="actions">
+                <button class="btn btn-sm btn-success" onclick="resolveIssue(${c.id})">Resolve</button>
+                <button class="btn btn-sm btn-danger" onclick="discardIssue(${c.id})">Discard</button>
+              </div>`;
+            } else if (c.status === 'resolved') {
+              actions = `<span style="font-size:11px;color:#999">Resolved ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+            } else {
+              actions = `<span style="font-size:11px;color:#999">Discarded ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+            }
+            return `<tr>
+              <td><strong>${esc(c.user_name)}</strong></td>
+              <td><strong>${esc(c.title)}</strong><div class="complaint-desc">${esc(c.description)}</div>${c.resolution ? '<div class="resolution-text">&#x2713; ' + esc(c.resolution) + '</div>' : ''}</td>
+              <td><span class="badge badge-${c.status}">${c.status.replace('_',' ')}</span></td>
+              <td class="complaint-meta">${dateStr}</td>
+              <td>${actions}</td>
+            </tr>`;
+          }).join('')
+        : '<tr><td colspan="5" class="empty-state">No complaints found.</td></tr>';
+    }
+
+    let actionId = null;
+
+    function acceptIssue(id) { actionId = id; openModal('acceptModal'); }
+    document.getElementById('acceptForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'in_progress', accepted_by: user.name }) });
+      closeModal('acceptModal'); loadComplaints('all'); showMsg('complaintMsg', 'Issue accepted and marked as in progress.', 'success');
+    });
+
+    function discardIssue(id) { actionId = id; openModal('discardModal'); }
+    document.getElementById('discardForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'discarded' }) });
+      closeModal('discardModal'); loadComplaints('all'); showMsg('complaintMsg', 'Issue discarded. Resident will be warned.', 'success');
+    });
+
+    function resolveIssue(id) { actionId = id; document.getElementById('resolutionText').value = ''; openModal('resolveModal'); }
+    document.getElementById('resolveForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const resolution = document.getElementById('resolutionText').value.trim();
+      if (!resolution) { showMsg('complaintMsg', 'Please describe the solution.', 'error'); return; }
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'resolved', resolution }) });
+      closeModal('resolveModal'); loadComplaints('all'); showMsg('complaintMsg', 'Issue resolved!', 'success');
+    });
+
+    let mtEditId = null;
+
+    function initMtFilters() {
+      const now = new Date(); const cy = now.getFullYear();
+      const monthSel = document.getElementById('mtFilterMonth');
+      const yearSel = document.getElementById('mtFilterYear');
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      monthSel.innerHTML = months.map((m,i) => `<option value="${String(i+1).padStart(2,'0')}" ${i===now.getMonth()?'selected':''}>${m}</option>`).join('');
+      yearSel.innerHTML = '';
+      for (let y = cy; y >= cy-5; y--) yearSel.innerHTML += `<option value="${y}" ${y===cy?'selected':''}>${y}</option>`;
+    }
+
+    async function loadMaintenanceAdmin() {
+      const month = document.getElementById('mtFilterMonth').value;
+      const year = document.getElementById('mtFilterYear').value;
+      const r = await fetch(API + '/maintenance'); const all = await r.json();
+      const filtered = all.filter(m => m.month === month && String(m.year) === year);
+
+      const total = filtered.length;
+      const paid = filtered.filter(m => m.status === 'paid').length;
+      const pending = total - paid;
+      document.getElementById('mtTotal').textContent = total;
+      document.getElementById('mtPaid').textContent = paid;
+      document.getElementById('mtPending').textContent = pending;
+
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('mtTable').innerHTML = filtered.length
+        ? filtered.map(m => `<tr><td>${esc(m.name||'Unknown')}</td><td>${esc(m.flat_number||'-')}</td><td>${months[parseInt(m.month)-1]} ${m.year}</td><td>₹${(m.amount||0).toLocaleString()}</td><td><span style="font-size:11px;padding:3px 12px;border-radius:20px;font-weight:600;background:${m.status==='paid'?'#F0FDF4':'#FEF2F2'};color:${m.status==='paid'?'#15803D':'#B91C1C'}">${m.status}</span></td><td style="font-size:11px;color:#999">${m.paid_date||'-'}</td><td><button class="btn btn-sm btn-outline" onclick="editMaintenance(${m.id},'${m.status}')">Edit</button></td></tr>`).join('')
+        : '<tr><td colspan="7" class="empty-state">No records for this period. Click "Generate Month" to create records.</td></tr>';
+    }
+
+    async function editMaintenance(id, status) {
+      mtEditId = id; document.getElementById('mtEditStatus').value = status; openModal('mtModal');
+    }
+
+    document.getElementById('mtForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const status = document.getElementById('mtEditStatus').value;
+      await fetch(API + '/maintenance/' + mtEditId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+      closeModal('mtModal'); loadMaintenanceAdmin(); showMsg('mtMsg', 'Maintenance updated!', 'success');
+    });
+
+    async function bulkMarkPaid() {
+      const month = document.getElementById('mtFilterMonth').value;
+      const year = document.getElementById('mtFilterYear').value;
+      const r = await fetch(API + '/maintenance'); const all = await r.json();
+      const pending = all.filter(m => m.month === month && String(m.year) === year && m.status === 'pending');
+      for (const m of pending) { await fetch(API + '/maintenance/' + m.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'paid' }) }); }
+      loadMaintenanceAdmin(); showMsg('mtMsg', `${pending.length} records marked as paid.`, 'success');
+    }
+
+    async function bulkCreateRecords() {
+      const month = document.getElementById('mtFilterMonth').value;
+      const year = document.getElementById('mtFilterYear').value;
+      const amount = prompt('Enter maintenance amount for this month:', '2000');
+      if (!amount) return;
+      const r = await fetch(API + '/maintenance/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ month, year, amount: parseFloat(amount) }) });
+      const d = await r.json();
+      showMsg('mtMsg', d.message, d.ok ? 'success' : 'error');
+      if (d.ok) loadMaintenanceAdmin();
+    }
+
+    function showMsg(id, text, type) { const el = document.getElementById(id); el.textContent = text; el.className = 'message ' + type; setTimeout(() => el.className = 'message', 3500); }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+      new MutationObserver(() => {
+        if (m.classList.contains('open')) {
+          const title = m.querySelector('h3');
+          if (title && !title.textContent.includes('Edit')) { title.textContent = title.textContent.replace('Edit', 'Add'); const form = m.querySelector('form'); if (form) form.reset(); const ug = document.getElementById('residentUserGroup'); if (ug) ug.style.display = ''; }
+        }
+      }).observe(m, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    init();
+  </script>
+</body>
+</html>

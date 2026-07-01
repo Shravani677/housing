@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahindra Gardens - Sign In</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F4F5EC; height: 100vh; display: flex; overflow: hidden; animation: fadeIn 0.6s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .split { display: flex; width: 100%; height: 100vh; }
+    .left { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 64px; background: linear-gradient(135deg, #F4F5EC 0%, #EEF0E4 100%); }
+    .left-inner { width: 100%; max-width: 420px; background: #fff; border: 1px solid #E0E1D8; border-radius: 24px; padding: 36px 40px; box-shadow: 0 8px 40px rgba(0,0,0,0.06); animation: slideUp 0.5s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .logo { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+    .logo-icon { width: 80px; height: 80px; background: #1E4D31; border-radius: 18px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 24px rgba(30,77,49,0.2); }
+    .logo-icon img { width: 80px; height: 80px; object-fit: cover; display: block; }
+    h1 { font-size: 30px; font-weight: 800; color: #111; letter-spacing: -0.5px; }
+    .subtitle { font-size: 15px; color: #666; margin-top: 6px; margin-bottom: 32px; }
+    .role-toggle { display: flex; gap: 0; background: #E8E9E0; border-radius: 50px; padding: 4px; margin-bottom: 28px; }
+    .role-btn { flex: 1; padding: 10px 0; border: none; background: transparent; border-radius: 50px; font-size: 13px; font-weight: 600; color: #666; cursor: pointer; transition: all 0.25s; }
+    .role-btn.active { background: #fff; color: #1E4D31; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .input-group { position: relative; margin-bottom: 18px; }
+    .input-group .icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px; pointer-events: none; }
+    .input-group input { width: 100%; padding: 16px 18px 16px 50px; background: #fff; border: 1px solid #E0E1D8; border-radius: 50px; font-size: 14px; color: #111; outline: none; transition: all 0.2s; font-family: inherit; }
+    .input-group input:focus { border-color: #1E4D31; box-shadow: 0 0 0 3px rgba(30,77,49,0.1); }
+    .input-group input::placeholder { color: #aaa; }
+    .password-wrap { position: relative; }
+    .toggle-pw { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #999; cursor: pointer; font-size: 16px; padding: 4px; }
+    .forgot-row { display: flex; justify-content: flex-end; margin: -10px 0 22px; }
+    .forgot-row a { font-size: 13px; color: #1E4D31; text-decoration: none; font-weight: 600; }
+    .forgot-row a:hover { text-decoration: underline; }
+    .btn-primary { width: 100%; padding: 16px; background: #1E4D31; border: none; border-radius: 50px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.25s; font-family: inherit; }
+    .btn-primary:hover { background: #163d27; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,77,49,0.25); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .signup-link { text-align: center; margin-top: 22px; font-size: 14px; color: #666; }
+    .signup-link a { color: #1E4D31; font-weight: 600; text-decoration: none; }
+    .signup-link a:hover { text-decoration: underline; }
+    .message { padding: 12px 16px; border-radius: 12px; font-size: 13px; display: none; text-align: center; margin-top: 16px; }
+    .message.error { display: block; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
+    .message.success { display: block; background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    /* Right pane */
+    .right { flex: 1; background: url('bg.jpg') center/cover; display: flex; flex-direction: column; justify-content: center; padding: 48px; position: relative; }
+    .right::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(30,77,49,0.2) 0%, transparent 50%); pointer-events: none; }
+    .right-inner { position: relative; z-index: 2; max-width: 460px; }
+    .right h2 { font-size: 24px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); animation: slideUp 0.6s ease; }
+    .testimonial-wrap { position: relative; min-height: 290px; }
+    .testimonial { background: #1E4D31; border-radius: 20px; padding: 24px 28px; position: absolute; width: 100%; opacity: 0; transition: opacity 0.6s ease; pointer-events: none; box-shadow: 0 8px 30px rgba(30,77,49,0.3); }
+    .testimonial.active { opacity: 1; pointer-events: auto; }
+    .quote-mark { font-size: 48px; color: #fff; font-weight: 800; line-height: 0.6; margin-bottom: 12px; }
+    .testimonial-text { font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.9); font-weight: 400; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+    .testimonial-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+    .testimonial-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .testimonial-location { font-size: 12px; color: rgba(255,255,255,0.6); }
+    .testimonial-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    .testimonial-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); border: none; cursor: pointer; transition: all 0.3s; padding: 0; }
+    .testimonial-dot.active { background: #fff; width: 24px; border-radius: 4px; }
+    @media (max-width: 768px) { .split { flex-direction: column; } .right { display: none; } .left { padding: 32px 24px; } }
+  </style>
+</head>
+<body>
+  <div class="split">
+    <div class="left">
+      <div class="left-inner">
+        <div class="logo">
+          <div class="logo-icon"><img src="logo.jpg" alt="Mahindra Gardens"></div>
+        </div>
+        <h1>Sign In</h1>
+        <p class="subtitle" id="subtitleText">Welcome Back!</p>
+
+        <div class="role-toggle" id="roleToggle">
+          <button class="role-btn active" data-role="resident">Resident</button>
+          <button class="role-btn" data-role="staff">Staff</button>
+          <button class="role-btn" data-role="admin">Admin</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form active" id="loginForm">
+          <div class="input-group">
+            <span class="icon">&#x2709;</span>
+            <input type="text" id="loginId" placeholder="Email or Full Name" required>
+          </div>
+          <div class="input-group">
+            <div class="password-wrap">
+              <span class="icon">&#x1F512;</span>
+              <input type="password" id="loginPassword" placeholder="Password" required>
+              <button type="button" class="toggle-pw" onclick="togglePW('loginPassword',this)">&#x1F441;</button>
+            </div>
+          </div>
+          <div class="forgot-row"><a href="#" id="forgotLink">Forgot password?</a></div>
+          <button type="submit" class="btn-primary">Sign In</button>
+          <div class="signup-link">Don't have an account? <a href="#" id="showSignup">Sign Up</a></div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form class="auth-form" id="signupForm">
+          <div class="input-group">
+            <span class="icon">&#x1F464;</span>
+            <input type="text" id="signupName" placeholder="Full Name" required>
+          </div>
+          <div class="input-group">
+            <span class="icon">&#x2709;</span>
+            <input type="email" id="signupEmail" placeholder="Email" required>
+          </div>
+          <div class="input-group">
+            <div class="password-wrap">
+              <span class="icon">&#x1F512;</span>
+              <input type="password" id="signupPassword" placeholder="Password (min. 8 characters)" required>
+              <button type="button" class="toggle-pw" onclick="togglePW('signupPassword',this)">&#x1F441;</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Create Account</button>
+          <div class="signup-link">Already have an account? <a href="#" id="showLogin">Sign In</a></div>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <div class="auth-form" id="forgotForm">
+          <div id="fpStep1">
+            <div class="input-group">
+              <span class="icon">&#x2709;</span>
+              <input type="email" id="fpEmail" placeholder="Enter your email">
+            </div>
+            <button class="btn-primary" id="fpSendBtn">Send Code</button>
+          </div>
+          <div id="fpStep2" style="display:none">
+            <div class="input-group">
+              <span class="icon">&#x1F511;</span>
+              <input type="text" id="fpCode" placeholder="Enter 6-digit code" maxlength="6">
+            </div>
+            <button class="btn-primary" id="fpVerifyBtn">Verify Code</button>
+            <div class="signup-link" style="margin-top:10px"><a href="#" id="fpResendLink">Resend code</a></div>
+          </div>
+          <div id="fpStep3" style="display:none">
+            <div class="input-group">
+              <div class="password-wrap">
+                <span class="icon">&#x1F512;</span>
+                <input type="password" id="fpNewPass" placeholder="New password (min. 8 characters)">
+                <button type="button" class="toggle-pw" onclick="togglePW('fpNewPass',this)">&#x1F441;</button>
+              </div>
+            </div>
+            <div class="input-group">
+              <div class="password-wrap">
+                <span class="icon">&#x1F512;</span>
+                <input type="password" id="fpConfirmPass" placeholder="Confirm new password">
+                <button type="button" class="toggle-pw" onclick="togglePW('fpConfirmPass',this)">&#x1F441;</button>
+              </div>
+            </div>
+            <button class="btn-primary" id="fpResetBtn">Reset Password</button>
+          </div>
+          <div class="signup-link" style="margin-top:16px"><a href="#" id="backToLoginFP">Back to Sign In</a></div>
+        </div>
+
+        <div class="message" id="message"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="right-inner">
+        <h2>Connected community, modern living,<br>better together.</h2>
+        <div class="testimonial-wrap" id="testimonialWrap">
+          <div class="testimonial active">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">Mahindra Gardens has transformed the way we connect with our neighbours. From maintenance requests to community events, everything is just a click away.</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">P</div>
+              <div>
+                <div class="testimonial-name">Priya Sharma</div>
+                <div class="testimonial-location">Block A, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">The society events organised here have brought our community closer than ever. Diwali celebrations, yoga camps, and weekend markets &mdash; there&rsquo;s always something happening!</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8)">R</div>
+              <div>
+                <div class="testimonial-name">Rajesh Mehta</div>
+                <div class="testimonial-location">Block C, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">Raising a complaint used to be a hassle. Now I just log in, submit it, and track its status in real time. The transparency is incredible.</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar" style="background:linear-gradient(135deg,#EC4899,#BE185D)">A</div>
+              <div>
+                <div class="testimonial-name">Ananya Patel</div>
+                <div class="testimonial-location">Block B, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">The maintenance tracking feature is a lifesaver. I can check my dues and payment history anytime, no more running to the office for receipts.</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">V</div>
+              <div>
+                <div class="testimonial-name">Vikram Singh</div>
+                <div class="testimonial-location">Block A, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">Our notice board is finally organised. Important announcements, waste collection schedules, power cuts &mdash; I never miss a thing anymore.</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar" style="background:linear-gradient(135deg,#10B981,#047857)">S</div>
+              <div>
+                <div class="testimonial-name">Sunita Iyer</div>
+                <div class="testimonial-location">Block D, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="quote-mark">&ldquo;</div>
+            <div class="testimonial-text">Moving in was stressful, but the resident directory helped us connect with neighbours instantly. Our kids found playmates within a week!</div>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar" style="background:linear-gradient(135deg,#F97316,#EA580C)">A</div>
+              <div>
+                <div class="testimonial-name">Arjun & Nita Kapoor</div>
+                <div class="testimonial-location">Block B, Mahindra Gardens</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-dots" id="testimonialDots"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    let currentRole = 'resident';
+
+    document.querySelectorAll('.role-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.role-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        currentRole = b.dataset.role;
+        hideMsg();
+      });
+    });
+
+    function togglePW(id, btn) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.innerHTML = inp.type === 'password' ? '&#x1F441;' : '&#x1F441;';
+    }
+
+    function switchForm(show) { document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); document.getElementById(show + 'Form').classList.add('active'); hideMsg(); document.querySelector('h1').textContent = show === 'login' ? 'Sign In' : show === 'forgot' ? 'Reset Password' : 'Sign Up'; document.getElementById('subtitleText').textContent = show === 'login' ? 'Welcome Back!' : show === 'forgot' ? 'We\'ll send you a code to reset your password' : 'Welcome to the Society Portal'; }
+    document.getElementById('showSignup').addEventListener('click', e => { e.preventDefault(); switchForm('signup'); });
+    document.getElementById('showLogin').addEventListener('click', e => { e.preventDefault(); switchForm('login'); });
+    document.getElementById('forgotLink').addEventListener('click', e => { e.preventDefault(); switchForm('forgot'); resetForgot(); hideMsg(); });
+
+    let fpEmail = '', fpCode = '';
+
+    function resetForgot() {
+      document.getElementById('fpStep1').style.display = '';
+      document.getElementById('fpStep2').style.display = 'none';
+      document.getElementById('fpStep3').style.display = 'none';
+      document.getElementById('fpEmail').value = '';
+      document.getElementById('fpCode').value = '';
+      document.getElementById('fpNewPass').value = '';
+      document.getElementById('fpConfirmPass').value = '';
+      fpEmail = ''; fpCode = '';
+      const btn = document.querySelector('#forgotForm .btn-primary');
+      if (btn) { btn.disabled = false; btn.textContent = btn.id === 'fpSendBtn' ? 'Send Code' : btn.id === 'fpVerifyBtn' ? 'Verify Code' : 'Reset Password'; }
+    }
+
+    async function fpSendCode() {
+      const email = document.getElementById('fpEmail').value.trim();
+      if (!email) { showMsg('Please enter your email.', 'error'); return; }
+      const btn = document.getElementById('fpSendBtn');
+      btn.disabled = true; btn.textContent = 'Sending...';
+      try {
+        const r = await fetch(API + '/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const d = await r.json();
+        if (d.ok) { fpEmail = email; document.getElementById('fpStep1').style.display = 'none'; document.getElementById('fpStep2').style.display = 'block'; const extra = d.demo_code ? ' (Demo code: ' + d.demo_code + ')' : ''; showMsg('Code sent! Check your email.' + extra, 'success'); } else { showMsg(d.error, 'error'); }
+      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Send Code'; }
+    }
+
+    async function fpVerifyCode() {
+      const code = document.getElementById('fpCode').value.trim();
+      if (!code || code.length !== 6) { showMsg('Enter the 6-digit code.', 'error'); return; }
+      const btn = document.getElementById('fpVerifyBtn');
+      btn.disabled = true; btn.textContent = 'Verifying...';
+      try {
+        const r = await fetch(API + '/verify-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fpEmail, code }) });
+        const d = await r.json();
+        if (d.ok) { fpCode = code; document.getElementById('fpStep2').style.display = 'none'; document.getElementById('fpStep3').style.display = 'block'; showMsg('Code verified. Set your new password.', 'success'); } else { showMsg(d.error, 'error'); }
+      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Verify Code'; }
+    }
+
+    async function fpResetPassword() {
+      const pass = document.getElementById('fpNewPass').value;
+      const confirm = document.getElementById('fpConfirmPass').value;
+      if (!pass || !confirm) { showMsg('Fill in both password fields.', 'error'); return; }
+      if (pass.length < 8) { showMsg('Password must be at least 8 characters.', 'error'); return; }
+      if (pass !== confirm) { showMsg('Passwords do not match.', 'error'); return; }
+      const btn = document.getElementById('fpResetBtn');
+      btn.disabled = true; btn.textContent = 'Resetting...';
+      try {
+        const r = await fetch(API + '/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fpEmail, code: fpCode, password: pass }) });
+        const d = await r.json();
+        if (d.ok) { showMsg(d.message + ' You can now sign in.', 'success'); setTimeout(() => switchForm('login'), 1500); } else { showMsg(d.error, 'error'); }
+      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Reset Password'; }
+    }
+
+    document.getElementById('fpSendBtn').addEventListener('click', fpSendCode);
+    document.getElementById('fpVerifyBtn').addEventListener('click', fpVerifyCode);
+    document.getElementById('fpResetBtn').addEventListener('click', fpResetPassword);
+    document.getElementById('fpResendLink').addEventListener('click', e => { e.preventDefault(); fpSendCode(); });
+    document.getElementById('fpEmail').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpSendCode(); } });
+    document.getElementById('fpCode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpVerifyCode(); } });
+    document.getElementById('fpNewPass').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpResetPassword(); } });
+    document.getElementById('fpConfirmPass').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpResetPassword(); } });
+
+    document.getElementById('backToLoginFP').addEventListener('click', e => { e.preventDefault(); resetForgot(); switchForm('login'); });
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const login_id = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      if (!login_id || !password) { showMsg('Please fill in all fields.', 'error'); return; }
+      setLoading('loginForm', true);
+      try {
+        const res = await fetch(API + '/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login_id, password, role: currentRole }) });
+        const data = await res.json();
+        if (data.ok) {
+          sessionStorage.setItem('user', JSON.stringify(data.user));
+          showMsg(data.message, 'success');
+          setTimeout(() => { window.location.href = data.user.role === 'admin' ? 'admin.html' : data.user.role === 'staff' ? 'staff.html' : 'dashboard.html'; }, 800);
+        } else { showMsg(data.error, 'error'); }
+      } catch { showMsg('Could not connect to server.', 'error'); }
+      finally { setLoading('loginForm', false); }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      if (!name || !email || !password) { showMsg('All fields are required.', 'error'); return; }
+      if (password.length < 8) { showMsg('Password must be at least 8 characters.', 'error'); return; }
+      setLoading('signupForm', true);
+      try {
+        const res = await fetch(API + '/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password, role: currentRole }) });
+        const data = await res.json();
+        if (data.ok) { showMsg(data.message, 'success'); document.getElementById('signupForm').reset(); } else { showMsg(data.error, 'error'); }
+      } catch { showMsg('Could not connect to server.', 'error'); }
+      finally { setLoading('signupForm', false); }
+    });
+
+    function showMsg(text, type) { const el = document.getElementById('message'); el.textContent = text; el.className = 'message ' + type; }
+    function hideMsg() { document.getElementById('message').className = 'message'; }
+    function setLoading(formId, loading) {
+      const btn = document.querySelector('#' + formId + ' .btn-primary:not([disabled])') || document.querySelector('#' + formId + ' .btn-primary');
+      if (!btn) return;
+      btn.disabled = loading;
+      if (loading) { btn.dataset.origText = btn.textContent; btn.textContent = 'Please wait...'; }
+      else { btn.textContent = btn.dataset.origText || (formId === 'loginForm' ? 'Sign In' : formId === 'signupForm' ? 'Create Account' : 'Send Code'); }
+    }
+
+    // Testimonial carousel
+    (function() {
+      const wrap = document.getElementById('testimonialWrap');
+      const testimonials = wrap.querySelectorAll('.testimonial');
+      const dotsContainer = document.getElementById('testimonialDots');
+      let current = 0;
+      let interval;
+
+      testimonials.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      function goTo(idx) {
+        testimonials[current].classList.remove('active');
+        dotsContainer.children[current].classList.remove('active');
+        current = idx;
+        testimonials[current].classList.add('active');
+        dotsContainer.children[current].classList.add('active');
+        resetInterval();
+      }
+
+      function next() { goTo((current + 1) % testimonials.length); }
+      function resetInterval() { clearInterval(interval); interval = setInterval(next, 7000); }
+      resetInterval();
+    })();
+  </script>
+</body>
+</html>

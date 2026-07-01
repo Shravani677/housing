@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahindra Gardens – Staff Panel</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #F4F5EC; color: #111; display: flex; min-height: 100vh; }
+    .sidebar { width: 220px; background: #fff; border-right: 1px solid #E0E1D8; padding: 24px 16px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+    .sidebar-logo-icon { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+    .sidebar-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .sidebar-logo h2 { font-size: 15px; font-weight: 700; color: #111; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .sidebar-nav a { padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #666; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
+    .sidebar-nav a:hover { background: #F4F5EC; color: #111; }
+    .sidebar-nav a.active { background: #1E4D31; color: #fff; }
+    .sidebar-footer { padding-top: 16px; border-top: 1px solid #E0E1D8; }
+    .user-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1E4D31; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
+    .user-meta { line-height: 1.3; }
+    .user-meta .name { font-size: 12px; font-weight: 600; color: #111; }
+    .user-meta .role { font-size: 10px; color: #666; text-transform: capitalize; }
+    .btn-logout { width: 100%; padding: 8px; background: transparent; border: 1px solid #E0E1D8; border-radius: 50px; color: #666; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-logout:hover { border-color: #1E4D31; color: #1E4D31; }
+    .main { flex: 1; padding: 28px 32px; max-width: calc(100vw - 220px); }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { font-size: 22px; font-weight: 800; color: #111; }
+    .page-header p { font-size: 13px; color: #666; margin-top: 4px; }
+    .card { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-header h3 { font-size: 15px; font-weight: 700; color: #111; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 14px; color: #666; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #E0E1D8; }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F1E8; color: #111; vertical-align: top; }
+    td .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty-state { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+    .btn { padding: 7px 16px; background: #1E4D31; border: none; border-radius: 50px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn:hover { background: #163d27; transform: translateY(-1px); }
+    .btn-sm { padding: 5px 12px; font-size: 11px; }
+    .btn-success { background: #16A34A; }
+    .btn-success:hover { background: #15803D; }
+    .btn-danger { background: #DC2626; }
+    .btn-danger:hover { background: #B91C1C; }
+    .btn-warning { background: #D97706; }
+    .btn-warning:hover { background: #B45309; }
+    .btn-outline { background: transparent; border: 1px solid #E0E1D8; color: #666; }
+    .btn-outline:hover { background: #F4F5EC; border-color: #1E4D31; color: #1E4D31; }
+    .badge { font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; display: inline-block; }
+    .badge-open { background: #FEF2F2; color: #B91C1C; }
+    .badge-in_progress { background: #FFFBEB; color: #A16207; }
+    .badge-resolved { background: #F0FDF4; color: #15803D; }
+    .badge-discarded { background: #F3F4F6; color: #6B7280; }
+    .complaint-desc { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.5; }
+    .complaint-meta { font-size: 11px; color: #999; margin-top: 3px; }
+    .resolution-text { font-size: 12px; color: #15803D; margin-top: 4px; padding: 6px 10px; background: #F0FDF4; border-radius: 8px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 28px; width: 480px; max-width: 90vw; }
+    .modal h3 { font-size: 17px; font-weight: 700; color: #111; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; background: #F8F9F2; border: 1px solid #E0E1D8; border-radius: 12px; color: #111; font-size: 14px; outline: none; transition: all 0.2s; font-family: inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1E4D31; background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .message { padding: 10px 14px; border-radius: 12px; font-size: 13px; display: none; margin-bottom: 12px; }
+    .message.error { display: block; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
+    .message.success { display: block; background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
+    .mt-summary { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .mt-summary-item { flex: 1; min-width: 120px; background: #F4F5EC; border-radius: 12px; padding: 16px; text-align: center; }
+    .mt-summary-num { font-size: 24px; font-weight: 800; color: #111; }
+    .mt-summary-label { font-size: 11px; color: #666; margin-top: 2px; }
+    @media (max-width: 768px) { .sidebar { width: 60px; padding: 16px 8px; } .sidebar-logo h2, .sidebar-nav a span, .user-meta, .btn-logout { display: none; } .main { max-width: calc(100vw - 60px); padding: 16px; } }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><img src="logo.jpg" alt="MG"></div>
+      <h2>Staff Panel</h2>
+    </div>
+    <div class="sidebar-nav">
+      <a class="active" data-page="issues">&#x1F4AC; <span>Ongoing Issues</span></a>
+      <a data-page="residents">&#x1F3E1; <span>Residents</span></a>
+      <a data-page="maintenance">&#x1F4B0; <span>Maintenance</span></a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="user-avatar" id="avatarLetter">S</div>
+        <div class="user-meta">
+          <div class="name" id="userName">Staff</div>
+          <div class="role" id="userRole">staff</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="page active" id="page-issues">
+      <div class="page-header"><h1>&#x1F4AC; Ongoing Issues</h1><p>Review, accept, and resolve resident complaints</p></div>
+      <div class="message" id="issueMsg"></div>
+      <div class="card">
+        <div class="card-header">
+          <h3>All Complaints</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('all')">All</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('open')">Open</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('in_progress')">Active</button>
+          </div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Resident</th><th>Issue</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="complaintTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-residents">
+      <div class="page-header"><h1>&#x1F3E1; Residents</h1><p>View society resident information</p></div>
+      <div class="card">
+        <div class="card-header"><h3>All Residents</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Flat</th><th>Family</th><th>Occupation</th><th>Phone</th></tr></thead><tbody id="residentTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-maintenance">
+      <div class="page-header"><h1>&#x1F4B0; Maintenance</h1><p>View resident maintenance payment status</p></div>
+      <div class="card">
+        <div class="card-header"><h3>Current Month</h3></div>
+        <div class="mt-summary" id="mtSummary">
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtTotal">0</div><div class="mt-summary-label">Total</div></div>
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtPaid">0</div><div class="mt-summary-label">Paid</div></div>
+          <div class="mt-summary-item"><div class="mt-summary-num" id="mtPending">0</div><div class="mt-summary-label">Pending</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>All Records</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Name</th><th>Flat</th><th>Month</th><th>Amount</th><th>Status</th><th>Paid</th></tr></thead><tbody id="mtTable"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accept modal -->
+  <div class="modal-overlay" id="acceptModal"><div class="modal">
+    <h3>Accept Issue</h3>
+    <form id="acceptForm">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">This issue will be marked as <strong>In Progress</strong>.</p>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('acceptModal')">Cancel</button><button type="submit" class="btn btn-warning">Accept Issue</button></div>
+    </form>
+  </div></div>
+
+  <!-- Discard modal -->
+  <div class="modal-overlay" id="discardModal"><div class="modal">
+    <h3>Discard Issue</h3>
+    <form id="discardForm">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">This issue will be marked as <strong>Discarded</strong> (solved or fraudulent).</p>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('discardModal')">Cancel</button><button type="submit" class="btn btn-danger">Discard Issue</button></div>
+    </form>
+  </div></div>
+
+  <!-- Resolve modal -->
+  <div class="modal-overlay" id="resolveModal"><div class="modal">
+    <h3>Resolve Issue</h3>
+    <form id="resolveForm">
+      <div class="form-group"><label>Describe what was done to solve this issue</label><textarea id="resolutionText" placeholder="Explain the solution..." required></textarea></div>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('resolveModal')">Cancel</button><button type="submit" class="btn btn-success">Mark Resolved</button></div>
+    </form>
+  </div></div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    let user = null;
+    let actionId = null;
+
+    function getUser() { const r = sessionStorage.getItem('user'); if (!r) { window.location.href = 'login.html'; return null; } return JSON.parse(r); }
+
+    function init() {
+      user = getUser(); if (!user) return;
+      document.getElementById('avatarLetter').textContent = user.name[0];
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userRole').textContent = user.role;
+      loadComplaints('all'); loadResidentsStaff(); loadMaintenanceStaff();
+    }
+
+    document.querySelectorAll('.sidebar-nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + a.dataset.page).classList.add('active');
+      });
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('user'); window.location.href = 'login.html'; });
+
+    function openModal(id) { actionId = null; document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
+
+    // ── Complaints ─────────────────────────────────────────────────────
+    async function loadComplaints(filter) {
+      const r = await fetch(API + '/complaints'); const list = await r.json();
+      const filtered = (filter === 'all' ? list : list.filter(c => c.status === filter)).filter(c => c.status !== 'discarded');
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('complaintTable').innerHTML = filtered.length
+        ? filtered.map(c => {
+            const d = new Date(c.created_at + 'Z');
+            const dateStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            let actions = '';
+            if (c.status === 'open') {
+              actions = `<div class="actions">
+                <button class="btn btn-sm btn-warning" onclick="acceptIssue(${c.id})">Accept</button>
+                <button class="btn btn-sm btn-danger" onclick="discardIssue(${c.id})">Discard</button>
+              </div>`;
+            } else if (c.status === 'in_progress') {
+              actions = `<div class="actions">
+                <button class="btn btn-sm btn-success" onclick="resolveIssue(${c.id})">Resolve</button>
+                <button class="btn btn-sm btn-danger" onclick="discardIssue(${c.id})">Discard</button>
+              </div>`;
+            } else if (c.status === 'resolved') {
+              actions = `<span style="font-size:11px;color:#999">Resolved ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+            } else {
+              actions = `<span style="font-size:11px;color:#999">Discarded ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+            }
+            return `<tr>
+              <td><strong>${esc(c.user_name)}</strong></td>
+              <td><strong>${esc(c.title)}</strong><div class="complaint-desc">${esc(c.description)}</div>${c.resolution ? '<div class="resolution-text">&#x2713; ' + esc(c.resolution) + '</div>' : ''}</td>
+              <td><span class="badge badge-${c.status}">${c.status.replace('_',' ')}</span></td>
+              <td class="complaint-meta">${dateStr}</td>
+              <td>${actions}</td>
+            </tr>`;
+          }).join('')
+        : '<tr><td colspan="5" class="empty-state">No complaints found.</td></tr>';
+    }
+
+    function acceptIssue(id) { actionId = id; openModal('acceptModal'); }
+    document.getElementById('acceptForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'in_progress', accepted_by: user.name }) });
+      closeModal('acceptModal'); loadComplaints('all'); showMsg('issueMsg', 'Issue accepted and marked as in progress.', 'success');
+    });
+
+    function discardIssue(id) { actionId = id; openModal('discardModal'); }
+    document.getElementById('discardForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'discarded' }) });
+      closeModal('discardModal'); loadComplaints('all'); showMsg('issueMsg', 'Issue discarded.', 'success');
+    });
+
+    function resolveIssue(id) { actionId = id; document.getElementById('resolutionText').value = ''; openModal('resolveModal'); }
+    document.getElementById('resolveForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const resolution = document.getElementById('resolutionText').value.trim();
+      if (!resolution) { showMsg('issueMsg', 'Please describe the solution.', 'error'); return; }
+      await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'resolved', resolution }) });
+      closeModal('resolveModal'); loadComplaints('all'); showMsg('issueMsg', 'Issue resolved!', 'success');
+    });
+
+    // ── Residents read-only ───────────────────────────────────────────
+    async function loadResidentsStaff() {
+      const r = await fetch(API + '/residents'); const list = await r.json();
+      document.getElementById('residentTable').innerHTML = list.length
+        ? list.map(r => `<tr><td><strong>${esc(r.name)}</strong><br><span style="font-size:11px;color:#666">${esc(r.email)}</span></td><td>${esc(r.flat_number)}</td><td>${r.family_members}</td><td>${esc(r.occupation)}</td><td>${esc(r.phone)}</td></tr>`).join('')
+        : '<tr><td colspan="5" class="empty-state">No residents added yet.</td></tr>';
+    }
+
+    // ── Maintenance read-only ─────────────────────────────────────────
+    async function loadMaintenanceStaff() {
+      const r = await fetch(API + '/maintenance'); const all = await r.json();
+      const now = new Date(); const month = String(now.getMonth()+1).padStart(2,'0'); const year = now.getFullYear();
+      const current = all.filter(m => m.month === month && String(m.year) === String(year));
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      document.getElementById('mtTotal').textContent = current.length;
+      document.getElementById('mtPaid').textContent = current.filter(m => m.status === 'paid').length;
+      document.getElementById('mtPending').textContent = current.filter(m => m.status === 'pending').length;
+      document.getElementById('mtTable').innerHTML = all.length
+        ? all.map(m => `<tr><td><strong>${esc(m.name||'Unknown')}</strong></td><td>${esc(m.flat_number||'-')}</td><td>${months[parseInt(m.month)-1]} ${m.year}</td><td>₹${(m.amount||0).toLocaleString()}</td><td><span class="badge badge-${m.status==='paid'?'resolved':'open'}">${m.status}</span></td><td style="font-size:11px;color:#999">${m.paid_date||'-'}</td></tr>`).join('')
+        : '<tr><td colspan="6" class="empty-state">No records.</td></tr>';
+    }
+
+    function showMsg(id, text, type) { const el = document.getElementById(id); el.textContent = text; el.className = 'message ' + type; setTimeout(() => el.className = 'message', 3000); }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    init();
+  </script>
+</body>
+</html>
