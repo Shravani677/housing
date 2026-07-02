@@ -256,7 +256,7 @@
       btn.innerHTML = inp.type === 'password' ? '&#x1F441;' : '&#x1F441;';
     }
 
-    function switchForm(show) { document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); document.getElementById(show + 'Form').classList.add('active'); hideMsg(); document.querySelector('h1').textContent = show === 'login' ? 'Sign In' : show === 'forgot' ? 'Reset Password' : 'Sign Up'; document.getElementById('subtitleText').textContent = show === 'login' ? 'Welcome Back!' : show === 'forgot' ? 'We\'ll send you a code to reset your password' : 'Welcome to the Society Portal'; }
+    function switchForm(show) { document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); document.getElementById(show + 'Form').classList.add('active'); hideMsg(); document.querySelector('h1').textContent = show === 'login' ? 'Sign In' : show === 'forgot' ? 'Reset Password' : 'Sign Up'; document.getElementById('subtitleText').textContent = show === 'login' ? 'Welcome Back!' : show === 'forgot' ? 'We\'ll send you a code to reset your password' : 'Welcome to the Society Portal'; document.getElementById('roleToggle').style.display = show === 'forgot' ? 'none' : ''; }
     document.getElementById('showSignup').addEventListener('click', e => { e.preventDefault(); switchForm('signup'); });
     document.getElementById('showLogin').addEventListener('click', e => { e.preventDefault(); switchForm('login'); });
     document.getElementById('forgotLink').addEventListener('click', e => { e.preventDefault(); switchForm('forgot'); resetForgot(); hideMsg(); });
@@ -358,7 +358,16 @@
       try {
         const res = await fetch(API + '/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password, role: currentRole }) });
         const data = await res.json();
-        if (data.ok) { showMsg(data.message, 'success'); document.getElementById('signupForm').reset(); } else { showMsg(data.error, 'error'); }
+        if (data.ok) {
+          showMsg(data.message, 'success');
+          document.getElementById('signupForm').reset();
+          if (data.user) {
+            sessionStorage.setItem('user', JSON.stringify(data.user));
+            if (data.user.role === 'resident') {
+              setTimeout(() => { window.location.href = 'complete-profile.html'; }, 800);
+            }
+          }
+        } else { showMsg(data.error, 'error'); }
       } catch { showMsg('Could not connect to server.', 'error'); }
       finally { setLoading('signupForm', false); }
     });

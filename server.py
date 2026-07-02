@@ -191,7 +191,7 @@ def signup():
             except sqlite3.IntegrityError:
                 pass
 
-    return jsonify({'ok': True, 'message': 'Account created successfully!'}), 201
+    return jsonify({'ok': True, 'message': 'Account created successfully!', 'user': {'id': uid, 'name': name, 'email': email, 'role': role}}), 201
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -433,6 +433,38 @@ def delete_resident(resident_id):
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute('DELETE FROM residents WHERE id = ?', (resident_id,))
     return jsonify({'ok': True, 'message': 'Resident removed!'})
+
+@app.route('/api/resident/<int:user_id>', methods=['GET'])
+def get_resident_by_user(user_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute('SELECT * FROM residents WHERE user_id = ?', (user_id,)).fetchone()
+    if not row:
+        return jsonify({'ok': False, 'error': 'Resident not found.'}), 404
+    d = dict(row)
+    user = _get_user(user_id)
+    d['name'] = user['name'] if user else ''
+    d['email'] = user['email'] if user else ''
+    return jsonify(d)
+
+@app.route('/api/resident/<int:user_id>', methods=['PUT'])
+def update_resident_by_user(user_id):
+    data = request.get_json()
+    flat_number = data.get('flat_number', '').strip().upper()
+    occupation = data.get('occupation', '').strip()
+    phone = data.get('phone', '').strip()
+    family_members = data.get('family_members', 1)
+    if not flat_number:
+        return jsonify({'ok': False, 'error': 'Flat number is required.'}), 400
+    with sqlite3.connect(DB_PATH) as conn:
+        existing = conn.execute('SELECT id FROM residents WHERE user_id = ?', (user_id,)).fetchone()
+        if existing:
+            conn.execute('UPDATE residents SET flat_number = ?, family_members = ?, occupation = ?, phone = ? WHERE user_id = ?',
+                         (flat_number, family_members, occupation, phone, user_id))
+        else:
+            conn.execute('INSERT INTO residents (user_id, flat_number, family_members, occupation, phone) VALUES (?, ?, ?, ?, ?)',
+                         (user_id, flat_number, family_members, occupation, phone))
+    return jsonify({'ok': True, 'message': 'Profile updated!'})
 
 # ── Maintenance ──────────────────────────────────────────────────────────
 
