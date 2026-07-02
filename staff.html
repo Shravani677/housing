@@ -52,6 +52,8 @@
     .btn-warning:hover { background: #B45309; }
     .btn-outline { background: transparent; border: 1px solid #E0E1D8; color: #666; }
     .btn-outline:hover { background: #F4F5EC; border-color: #1E4D31; color: #1E4D31; }
+    .active-filter { background: #1E4D31 !important; border-color: #1E4D31 !important; color: #fff !important; }
+    .active-filter:hover { background: #163d27 !important; color: #fff !important; }
     .badge { font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; display: inline-block; }
     .badge-open { background: #FEF2F2; color: #B91C1C; }
     .badge-in_progress { background: #FFFBEB; color: #A16207; }
@@ -110,10 +112,12 @@
       <div class="card">
         <div class="card-header">
           <h3>All Complaints</h3>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-sm btn-outline" onclick="loadComplaints('all')">All</button>
+          <div style="display:flex;gap:8px" id="filterBtns">
+            <button class="btn btn-sm btn-outline active-filter" onclick="loadComplaints('all')">All</button>
             <button class="btn btn-sm btn-outline" onclick="loadComplaints('open')">Open</button>
             <button class="btn btn-sm btn-outline" onclick="loadComplaints('in_progress')">Active</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('resolved')">Resolved</button>
+            <button class="btn btn-sm btn-outline" onclick="loadComplaints('discarded')">Discarded</button>
           </div>
         </div>
         <div class="table-wrap"><table><thead><tr><th>Resident</th><th>Issue</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="complaintTable"></tbody></table></div>
@@ -172,6 +176,15 @@
     </form>
   </div></div>
 
+  <!-- Delete modal -->
+  <div class="modal-overlay" id="deleteModal"><div class="modal">
+    <h3>Delete Complaint</h3>
+    <form id="deleteForm">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">This complaint will be <strong>permanently deleted</strong>. This action cannot be undone.</p>
+      <div class="form-actions"><button type="button" class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button><button type="submit" class="btn btn-danger">Delete Permanently</button></div>
+    </form>
+  </div></div>
+
   <script>
     const API = 'http://localhost:5000/api';
     let user = null;
@@ -198,14 +211,15 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('user'); window.location.href = 'login.html'; });
 
-    function openModal(id) { actionId = null; document.getElementById(id).classList.add('open'); }
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }); });
 
     // ── Complaints ─────────────────────────────────────────────────────
     async function loadComplaints(filter) {
       const r = await fetch(API + '/complaints'); const list = await r.json();
-      const filtered = (filter === 'all' ? list : list.filter(c => c.status === filter)).filter(c => c.status !== 'discarded');
+      const filtered = filter === 'all' ? list : list.filter(c => c.status === filter);
+      document.querySelectorAll('#filterBtns .btn').forEach(b => { b.classList.remove('active-filter'); if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + filter + "'")) b.classList.add('active-filter'); });
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       document.getElementById('complaintTable').innerHTML = filtered.length
         ? filtered.map(c => {
@@ -224,8 +238,10 @@
               </div>`;
             } else if (c.status === 'resolved') {
               actions = `<span style="font-size:11px;color:#999">Resolved ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+            } else if (c.status === 'discarded') {
+              actions = `<div class="actions"><span style="font-size:11px;color:#999;margin-right:4px">Discarded ${c.resolved_at ? 'on '+c.resolved_at : ''}</span><button class="btn btn-sm btn-danger" onclick="deleteComplaint(${c.id})">Delete</button></div>`;
             } else {
-              actions = `<span style="font-size:11px;color:#999">Discarded ${c.resolved_at ? 'on '+c.resolved_at : ''}</span>`;
+              actions = `<span style="font-size:11px;color:#999">${c.status}</span>`;
             }
             return `<tr>
               <td><strong>${esc(c.user_name)}</strong></td>
@@ -259,6 +275,13 @@
       if (!resolution) { showMsg('issueMsg', 'Please describe the solution.', 'error'); return; }
       await fetch(API + '/complaints/' + actionId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'resolved', resolution }) });
       closeModal('resolveModal'); loadComplaints('all'); showMsg('issueMsg', 'Issue resolved!', 'success');
+    });
+
+    function deleteComplaint(id) { actionId = id; openModal('deleteModal'); }
+    document.getElementById('deleteForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      await fetch(API + '/complaints/' + actionId, { method: 'DELETE' });
+      closeModal('deleteModal'); loadComplaints('all'); showMsg('issueMsg', 'Complaint permanently deleted.', 'success');
     });
 
     // ── Residents read-only ───────────────────────────────────────────

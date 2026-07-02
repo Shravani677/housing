@@ -380,6 +380,12 @@ def update_complaint(complaint_id):
             conn.execute('UPDATE complaints SET status = ? WHERE id = ?', (status, complaint_id))
     return jsonify({'ok': True, 'message': 'Complaint updated.'})
 
+@app.route('/api/complaints/<int:complaint_id>', methods=['DELETE'])
+def delete_complaint(complaint_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute('DELETE FROM complaints WHERE id = ?', (complaint_id,))
+    return jsonify({'ok': True, 'message': 'Complaint deleted.'})
+
 # ── Residents ─────────────────────────────────────────────────────────────
 
 @app.route('/api/residents', methods=['GET'])
@@ -473,16 +479,12 @@ def get_maintenance():
     user_id = request.args.get('user_id')
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
-        if user_id:
-            rows = conn.execute('SELECT * FROM maintenance WHERE user_id = ? ORDER BY year DESC, month DESC', (user_id,)).fetchall()
-        else:
-            rows = conn.execute('SELECT m.*, r.flat_number FROM maintenance m LEFT JOIN residents r ON r.user_id = m.user_id ORDER BY m.year DESC, m.month DESC').fetchall()
+        rows = conn.execute('SELECT m.*, r.flat_number FROM maintenance m LEFT JOIN residents r ON r.user_id = m.user_id ' + ('WHERE m.user_id = ?' if user_id else '') + ' ORDER BY m.year DESC, m.month DESC', (user_id,) if user_id else ()).fetchall()
     result = []
     for r in rows:
         d = dict(r)
-        if not user_id:
-            user = _get_user(d['user_id'])
-            d['name'] = user['name'] if user else 'Unknown'
+        user = _get_user(d['user_id'])
+        d['name'] = user['name'] if user else 'Unknown'
         result.append(d)
     return jsonify(result)
 
@@ -498,11 +500,14 @@ def get_current_maintenance():
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         row = conn.execute(
-            'SELECT * FROM maintenance WHERE user_id = ? AND month = ? AND year = ?',
+            'SELECT m.*, r.flat_number FROM maintenance m LEFT JOIN residents r ON r.user_id = m.user_id WHERE m.user_id = ? AND m.month = ? AND m.year = ?',
             (user_id, month, year)
         ).fetchone()
     if row:
-        return jsonify(dict(row))
+        d = dict(row)
+        user = _get_user(user_id)
+        d['name'] = user['name'] if user else ''
+        return jsonify(d)
     return jsonify(None)
 
 @app.route('/api/maintenance', methods=['POST'])

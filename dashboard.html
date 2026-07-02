@@ -86,6 +86,41 @@
     .message { padding: 10px 14px; border-radius: 12px; font-size: 13px; display: none; text-align: center; margin-top: 12px; }
     .message.error { display: block; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
     .message.success { display: block; background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
+    .mt-row-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-invoice { padding: 4px 12px; background: transparent; border: 1px solid #1E4D31; border-radius: 50px; color: #1E4D31; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .btn-invoice:hover { background: #1E4D31; color: #fff; }
+    .mt-card-clickable { cursor: pointer; transition: box-shadow 0.2s; }
+    .mt-card-clickable:hover { box-shadow: 0 4px 16px rgba(30,77,49,0.1); }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 20px; max-width: 520px; width: 100%; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.3s ease; position: relative; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer; }
+    .modal-close:hover { color: #111; }
+    .invoice-header { text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid #F0F1E8; }
+    .invoice-header h2 { font-size: 20px; font-weight: 800; color: #1E4D31; }
+    .invoice-header p { font-size: 12px; color: #666; margin-top: 3px; }
+    .invoice-body { }
+    .invoice-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #F8F9F2; }
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-label { color: #666; font-weight: 500; }
+    .invoice-value { color: #111; font-weight: 600; }
+    .invoice-total { padding: 12px 0; margin-top: 8px; border-top: 2px solid #1E4D31; font-size: 16px; font-weight: 800; color: #1E4D31; display: flex; justify-content: space-between; }
+    .invoice-actions { display: flex; gap: 12px; margin-top: 20px; }
+    .invoice-actions button { flex: 1; padding: 12px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .btn-print { background: #1E4D31; border: none; color: #fff; }
+    .btn-print:hover { background: #163d27; }
+    .btn-print:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-download { background: transparent; border: 1px solid #E0E1D8; color: #666; }
+    .btn-download:hover { border-color: #1E4D31; color: #1E4D31; }
+    @media print {
+      body * { visibility: hidden; }
+      .modal-overlay { position: absolute; background: none; padding: 0; display: block !important; }
+      .modal-overlay.show { display: block !important; }
+      .modal { box-shadow: none; border: 1px solid #ddd; max-width: 100%; animation: none; position: static; margin: 20px auto; }
+      .modal, .modal * { visibility: visible; }
+      .modal-close, .invoice-actions, .mt-card-clickable { display: none !important; }
+    }
     @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .topbar { padding: 12px 16px; } .main { padding: 16px; } }
   </style>
 </head>
@@ -157,6 +192,21 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal">
+      <button class="modal-close" id="invoiceClose">&times;</button>
+      <div class="invoice-header">
+        <h2>Mahindra Gardens</h2>
+        <p>Sector 62, Noida &middot; Maintenance Invoice</p>
+      </div>
+      <div class="invoice-body" id="invoiceBody"></div>
+      <div class="invoice-actions">
+        <button class="btn-download" id="invoiceDownload" disabled>Download PDF</button>
+        <button class="btn-print" id="invoicePrint">Print Invoice</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API = 'http://localhost:5000/api';
     let user = null;
@@ -219,22 +269,44 @@
       const row = await r.json();
       const badge = document.getElementById('mtBadge');
       const amt = document.getElementById('mtAmount');
+      const card = document.getElementById('maintenanceCard');
       if (row && row.id) {
         badge.textContent = row.status === 'paid' ? 'Paid' : 'Pending';
         badge.className = 'mt-status-badge mt-status-' + row.status;
         amt.textContent = '₹' + row.amount.toLocaleString();
+        card.classList.add('mt-card-clickable');
+        card.onclick = () => showInvoice(row);
       } else {
         badge.textContent = 'No Record';
         badge.className = 'mt-status-badge';
         badge.style.background = '#F4F5EC'; badge.style.color = '#666';
         amt.textContent = '';
+        card.classList.remove('mt-card-clickable');
+        card.onclick = null;
       }
       const r2 = await fetch(API + '/maintenance?user_id=' + user.id);
       const all = await r2.json();
       const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       document.getElementById('mtHistoryList').innerHTML = all.length
-        ? all.map(m => `<div class="mt-row"><span class="mt-row-month">${months[parseInt(m.month)-1]} ${m.year}</span><span class="mt-row-status mt-status-${m.status}">${m.status === 'paid' ? 'Paid' : 'Pending'}</span><span class="mt-row-date">${m.paid_date || '-'}</span></div>`).join('')
+        ? all.map(m => `<div class="mt-row"><span class="mt-row-month">${months[parseInt(m.month)-1]} ${m.year}</span><span class="mt-row-status mt-status-${m.status}">${m.status === 'paid' ? 'Paid' : 'Pending'}</span><span class="mt-row-actions"><span class="mt-row-date">${m.paid_date || '-'}</span><button class="btn-invoice" onclick='showInvoice(${JSON.stringify(m).replace(/'/g,"&#39;")})'>Invoice</button></span></div>`).join('')
         : '<div class="mt-row" style="color:#999;justify-content:center">No records found</div>';
+    }
+
+    function showInvoice(m) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const statusText = m.status === 'paid' ? 'Paid' : 'Pending';
+      const invNo = 'INV-' + m.year + '-' + m.month + '-' + String(m.user_id).padStart(3,'0');
+      document.getElementById('invoiceBody').innerHTML = `
+        <div class="invoice-row"><span class="invoice-label">Invoice No.</span><span class="invoice-value">${invNo}</span></div>
+        <div class="invoice-row"><span class="invoice-label">Resident</span><span class="invoice-value">${esc(m.name || user.name)}</span></div>
+        <div class="invoice-row"><span class="invoice-label">Flat Number</span><span class="invoice-value">${m.flat_number || '-'}</span></div>
+        <div class="invoice-row"><span class="invoice-label">Period</span><span class="invoice-value">${months[parseInt(m.month)-1]} ${m.year}</span></div>
+        <div class="invoice-row"><span class="invoice-label">Status</span><span class="invoice-value" style="color:${m.status === 'paid' ? '#15803D' : '#B91C1C'}">${statusText}</span></div>
+        ${m.paid_date ? `<div class="invoice-row"><span class="invoice-label">Paid On</span><span class="invoice-value">${m.paid_date}</span></div>` : ''}
+        <div class="invoice-total"><span>Total Amount</span><span>₹${Number(m.amount).toLocaleString()}</span></div>
+        <div style="text-align:center;margin-top:12px;font-size:11px;color:#999">${m.status === 'paid' ? '&#x2705; This invoice has been paid. Thank you!' : '&#x23F0; Payment pending. Please pay before the due date.'}</div>
+      `;
+      document.getElementById('invoiceModal').classList.add('show');
     }
 
     async function loadFraudWarnings() {
@@ -251,6 +323,10 @@
         }
       } catch {}
     }
+
+    document.getElementById('invoiceClose').addEventListener('click', () => document.getElementById('invoiceModal').classList.remove('show'));
+    document.getElementById('invoiceModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+    document.getElementById('invoicePrint').addEventListener('click', () => window.print());
 
     document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('user'); window.location.href = 'login.html'; });
     function showMsg(text, type) { const el = document.getElementById('complaintMessage'); el.textContent = text; el.className = 'message ' + type; setTimeout(() => el.className = 'message', 3000); }

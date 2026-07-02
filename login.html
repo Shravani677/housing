@@ -363,9 +363,8 @@
           document.getElementById('signupForm').reset();
           if (data.user) {
             sessionStorage.setItem('user', JSON.stringify(data.user));
-            if (data.user.role === 'resident') {
-              setTimeout(() => { window.location.href = 'complete-profile.html'; }, 800);
-            }
+            const target = data.user.role === 'resident' ? 'complete-profile.html' : data.user.role === 'admin' ? 'admin.html' : 'staff.html';
+            setTimeout(() => { window.location.href = target; }, 800);
           }
         } else { showMsg(data.error, 'error'); }
       } catch { showMsg('Could not connect to server.', 'error'); }

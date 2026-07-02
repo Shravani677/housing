@@ -1,0 +1,3 @@
+Name: Aksh Chad
+Email: aksh@test.com
+Role: resident
