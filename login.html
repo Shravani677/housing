@@ -6,6 +6,8 @@
   <title>Rivali Park - Sign In</title>
   <link rel="icon" href="logo.jpg" type="image/jpeg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #F4F5EC; height: 100vh; display: flex; overflow: hidden; animation: fadeIn 0.6s ease; }
@@ -126,32 +128,7 @@
               <span class="icon">&#x2709;</span>
               <input type="email" id="fpEmail" placeholder="Enter your email">
             </div>
-            <button class="btn-primary" id="fpSendBtn">Send Code</button>
-          </div>
-          <div id="fpStep2" style="display:none">
-            <div class="input-group">
-              <span class="icon">&#x1F511;</span>
-              <input type="text" id="fpCode" placeholder="Enter 6-digit code" maxlength="6">
-            </div>
-            <button class="btn-primary" id="fpVerifyBtn">Verify Code</button>
-            <div class="signup-link" style="margin-top:10px"><a href="#" id="fpResendLink">Resend code</a></div>
-          </div>
-          <div id="fpStep3" style="display:none">
-            <div class="input-group">
-              <div class="password-wrap">
-                <span class="icon">&#x1F512;</span>
-                <input type="password" id="fpNewPass" placeholder="New password (min. 8 characters)">
-                <button type="button" class="toggle-pw" onclick="togglePW('fpNewPass',this)">&#x1F441;</button>
-              </div>
-            </div>
-            <div class="input-group">
-              <div class="password-wrap">
-                <span class="icon">&#x1F512;</span>
-                <input type="password" id="fpConfirmPass" placeholder="Confirm new password">
-                <button type="button" class="toggle-pw" onclick="togglePW('fpConfirmPass',this)">&#x1F441;</button>
-              </div>
-            </div>
-            <button class="btn-primary" id="fpResetBtn">Reset Password</button>
+            <button class="btn-primary" id="fpSendBtn">Send Reset Link</button>
           </div>
           <div class="signup-link" style="margin-top:16px"><a href="#" id="backToLoginFP">Back to Sign In</a></div>
         </div>
@@ -241,6 +218,16 @@
     const API = 'http://localhost:5000/api';
     let currentRole = 'resident';
 
+    firebase.initializeApp({
+      apiKey: "AIzaSyAEtvIqs0Vw-b8CWU9jSLsUAFANOjbDpEs",
+      authDomain: "mahindra-gardens.firebaseapp.com",
+      projectId: "mahindra-gardens",
+      storageBucket: "mahindra-gardens.firebasestorage.app",
+      messagingSenderId: "532932152041",
+      appId: "1:532932152041:web:3007d6c3bf0897297e3e78"
+    });
+    const auth = firebase.auth();
+
     document.querySelectorAll('.role-btn').forEach(b => {
       b.addEventListener('click', () => {
         document.querySelectorAll('.role-btn').forEach(x => x.classList.remove('active'));
@@ -256,24 +243,13 @@
       btn.innerHTML = inp.type === 'password' ? '&#x1F441;' : '&#x1F441;';
     }
 
-    function switchForm(show) { document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); document.getElementById(show + 'Form').classList.add('active'); hideMsg(); document.querySelector('h1').textContent = show === 'login' ? 'Sign In' : show === 'forgot' ? 'Reset Password' : 'Sign Up'; document.getElementById('subtitleText').textContent = show === 'login' ? 'Welcome Back!' : show === 'forgot' ? 'We\'ll send you a code to reset your password' : 'Welcome to the Society Portal'; document.getElementById('roleToggle').style.display = show === 'forgot' ? 'none' : ''; }
+    function switchForm(show) { document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active')); document.getElementById(show + 'Form').classList.add('active'); hideMsg(); document.querySelector('h1').textContent = show === 'login' ? 'Sign In' : show === 'forgot' ? 'Reset Password' : 'Sign Up'; document.getElementById('subtitleText').textContent = show === 'login' ? 'Welcome Back!' : show === 'forgot' ? 'Enter your email and we\'ll send you a reset link' : 'Welcome to the Society Portal'; document.getElementById('roleToggle').style.display = show === 'forgot' ? 'none' : ''; }
     document.getElementById('showSignup').addEventListener('click', e => { e.preventDefault(); switchForm('signup'); });
     document.getElementById('showLogin').addEventListener('click', e => { e.preventDefault(); switchForm('login'); });
     document.getElementById('forgotLink').addEventListener('click', e => { e.preventDefault(); switchForm('forgot'); resetForgot(); hideMsg(); });
 
-    let fpEmail = '', fpCode = '';
-
     function resetForgot() {
-      document.getElementById('fpStep1').style.display = '';
-      document.getElementById('fpStep2').style.display = 'none';
-      document.getElementById('fpStep3').style.display = 'none';
       document.getElementById('fpEmail').value = '';
-      document.getElementById('fpCode').value = '';
-      document.getElementById('fpNewPass').value = '';
-      document.getElementById('fpConfirmPass').value = '';
-      fpEmail = ''; fpCode = '';
-      const btn = document.querySelector('#forgotForm .btn-primary');
-      if (btn) { btn.disabled = false; btn.textContent = btn.id === 'fpSendBtn' ? 'Send Code' : btn.id === 'fpVerifyBtn' ? 'Verify Code' : 'Reset Password'; }
     }
 
     async function fpSendCode() {
@@ -282,52 +258,19 @@
       const btn = document.getElementById('fpSendBtn');
       btn.disabled = true; btn.textContent = 'Sending...';
       try {
-        const r = await fetch(API + '/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-        const d = await r.json();
-        if (d.ok) { fpEmail = email; document.getElementById('fpStep1').style.display = 'none'; document.getElementById('fpStep2').style.display = 'block'; const extra = d.demo_code ? ' (Demo code: ' + d.demo_code + ')' : ''; showMsg('Code sent! Check your email.' + extra, 'success'); } else { showMsg(d.error, 'error'); }
-      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
-      finally { btn.disabled = false; btn.textContent = 'Send Code'; }
-    }
-
-    async function fpVerifyCode() {
-      const code = document.getElementById('fpCode').value.trim();
-      if (!code || code.length !== 6) { showMsg('Enter the 6-digit code.', 'error'); return; }
-      const btn = document.getElementById('fpVerifyBtn');
-      btn.disabled = true; btn.textContent = 'Verifying...';
-      try {
-        const r = await fetch(API + '/verify-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fpEmail, code }) });
-        const d = await r.json();
-        if (d.ok) { fpCode = code; document.getElementById('fpStep2').style.display = 'none'; document.getElementById('fpStep3').style.display = 'block'; showMsg('Code verified. Set your new password.', 'success'); } else { showMsg(d.error, 'error'); }
-      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
-      finally { btn.disabled = false; btn.textContent = 'Verify Code'; }
-    }
-
-    async function fpResetPassword() {
-      const pass = document.getElementById('fpNewPass').value;
-      const confirm = document.getElementById('fpConfirmPass').value;
-      if (!pass || !confirm) { showMsg('Fill in both password fields.', 'error'); return; }
-      if (pass.length < 8) { showMsg('Password must be at least 8 characters.', 'error'); return; }
-      if (pass !== confirm) { showMsg('Passwords do not match.', 'error'); return; }
-      const btn = document.getElementById('fpResetBtn');
-      btn.disabled = true; btn.textContent = 'Resetting...';
-      try {
-        const r = await fetch(API + '/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fpEmail, code: fpCode, password: pass }) });
-        const d = await r.json();
-        if (d.ok) { showMsg(d.message + ' You can now sign in.', 'success'); setTimeout(() => switchForm('login'), 1500); } else { showMsg(d.error, 'error'); }
-      } catch (e) { console.error(e); showMsg('Server error.', 'error'); }
-      finally { btn.disabled = false; btn.textContent = 'Reset Password'; }
+        await auth.sendPasswordResetEmail(email);
+        showMsg('Password reset email sent! Check your inbox (and spam).', 'success');
+      } catch (err) {
+        if (err.code === 'auth/user-not-found') showMsg('No account found with this email.', 'error');
+        else showMsg(err.message || 'Server error.', 'error');
+      }
+      finally { btn.disabled = false; btn.textContent = 'Send Reset Link'; }
     }
 
     document.getElementById('fpSendBtn').addEventListener('click', fpSendCode);
-    document.getElementById('fpVerifyBtn').addEventListener('click', fpVerifyCode);
-    document.getElementById('fpResetBtn').addEventListener('click', fpResetPassword);
-    document.getElementById('fpResendLink').addEventListener('click', e => { e.preventDefault(); fpSendCode(); });
     document.getElementById('fpEmail').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpSendCode(); } });
-    document.getElementById('fpCode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpVerifyCode(); } });
-    document.getElementById('fpNewPass').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpResetPassword(); } });
-    document.getElementById('fpConfirmPass').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fpResetPassword(); } });
 
-    document.getElementById('backToLoginFP').addEventListener('click', e => { e.preventDefault(); resetForgot(); switchForm('login'); });
+    document.getElementById('backToLoginFP').addEventListener('click', e => { e.preventDefault(); switchForm('login'); });
 
     document.getElementById('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
@@ -378,7 +321,7 @@
       if (!btn) return;
       btn.disabled = loading;
       if (loading) { btn.dataset.origText = btn.textContent; btn.textContent = 'Please wait...'; }
-      else { btn.textContent = btn.dataset.origText || (formId === 'loginForm' ? 'Sign In' : formId === 'signupForm' ? 'Create Account' : 'Send Code'); }
+      else { btn.textContent = btn.dataset.origText || (formId === 'loginForm' ? 'Sign In' : formId === 'signupForm' ? 'Create Account' : 'Send Reset Link'); }
     }
 
     // Testimonial carousel
