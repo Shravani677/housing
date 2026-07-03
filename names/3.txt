@@ -1,3 +1,0 @@
-Name: Staff User
-Email: staff@test.com
-Role: staff

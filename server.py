@@ -9,6 +9,8 @@ CORS(app, origins='*')
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE, 'data')
+TEMPLATES_DIR = os.path.join(BASE, 'templates')
+STATIC_DIR = os.path.join(BASE, 'static')
 os.makedirs(DATA_DIR, exist_ok=True)
 
 cred = credentials.Certificate(os.path.join(BASE, 'firebase-key.json'))
@@ -544,11 +546,15 @@ def bulk_create_maintenance():
 
 @app.route('/')
 def serve_index():
-    return send_from_directory(BASE, 'login.html')
+    return send_from_directory(TEMPLATES_DIR, 'login.html')
 
 @app.route('/<path:filename>')
 def serve_static(filename):
-    return send_from_directory(BASE, filename)
+    return send_from_directory(TEMPLATES_DIR, filename)
+
+@app.route('/static/<path:filename>')
+def serve_assets(filename):
+    return send_from_directory(STATIC_DIR, filename)
 
 if __name__ == '__main__':
     print('Server running with Firebase Auth + JSON storage')

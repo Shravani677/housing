@@ -6,33 +6,15 @@
     "role": "admin"
   },
   {
-    "id": "7aXrqnHVUqOAFt8NFLx6Pg8CRZH2",
-    "name": "Staff User",
-    "email": "staff@mahindra.com",
-    "role": "staff"
-  },
-  {
-    "id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
-    "name": "Amit Sharma",
-    "email": "resident1@mahindra.com",
+    "id": "R0qITL9xk1Rp46S2xvwsBrEHz3m1",
+    "name": "Ronit Jaiswal",
+    "email": "ronit@test.com",
     "role": "resident"
   },
   {
-    "id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
-    "name": "Priya Patel",
-    "email": "resident2@mahindra.com",
+    "id": "VgeDJ43x5eZvKsQ7TLPrsBP9eA53",
+    "name": "Yash Nimde",
+    "email": "yash@test.com",
     "role": "resident"
-  },
-  {
-    "id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
-    "name": "Rahul Verma",
-    "email": "resident3@mahindra.com",
-    "role": "resident"
-  },
-  {
-    "id": "EvtfQkcwfCcULUFjmyUaIV0ShY63",
-    "name": "Nimade CHAD",
-    "email": "ronitjaiswal0907@gmail.com",
-    "role": "admin"
   }
 ]

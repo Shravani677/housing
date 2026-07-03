@@ -1,3 +1,0 @@
-Name: Priya Resident
-Email: priya@test.com
-Role: resident

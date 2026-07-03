@@ -1,26 +1,18 @@
 [
   {
-    "id": 1,
-    "user_id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
-    "flat_number": "A-101",
-    "family_members": 3,
-    "occupation": "Service",
-    "phone": "9876543210"
+    "id": 4,
+    "user_id": "R0qITL9xk1Rp46S2xvwsBrEHz3m1",
+    "flat_number": "105",
+    "family_members": 1,
+    "occupation": "noob",
+    "phone": "9867182917"
   },
   {
-    "id": 2,
-    "user_id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
-    "flat_number": "A-102",
-    "family_members": 3,
-    "occupation": "Service",
-    "phone": "9876543210"
-  },
-  {
-    "id": 3,
-    "user_id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
-    "flat_number": "A-103",
-    "family_members": 3,
-    "occupation": "Service",
-    "phone": "9876543210"
+    "id": 5,
+    "user_id": "VgeDJ43x5eZvKsQ7TLPrsBP9eA53",
+    "flat_number": "105",
+    "family_members": 4,
+    "occupation": "Engineer",
+    "phone": "9867182917"
   }
 ]

@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Complete Profile - Mahindra Gardens</title>
-  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <link rel="icon" href="static/logo.jpg" type="image/jpeg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #F4F5EC; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.6s ease; }
+    body { font-family: 'Inter', sans-serif; background: #F4F5EC; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeIn 0.6s ease; position: relative; }
+    body::before { content: ''; position: fixed; inset: 0; background: url('static/bg-profile.jpg') center/cover no-repeat; filter: brightness(0.6); z-index: -1; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .card { width: 100%; max-width: 480px; background: #fff; border: 1px solid #E0E1D8; border-radius: 24px; padding: 36px 40px; box-shadow: 0 8px 40px rgba(0,0,0,0.06); animation: slideUp 0.5s ease; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -39,7 +40,7 @@
 <body>
   <div class="card">
     <div class="logo">
-      <div class="logo-icon"><img src="logo.jpg" alt="Mahindra Gardens"></div>
+      <div class="logo-icon"><img src="static/logo.jpg" alt="Mahindra Gardens"></div>
     </div>
     <h1>Complete Your Profile</h1>
     <p class="subtitle">Welcome! Please fill in your residency details to get started.</p>
