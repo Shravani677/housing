@@ -258,12 +258,11 @@
       const btn = document.getElementById('fpSendBtn');
       btn.disabled = true; btn.textContent = 'Sending...';
       try {
-        await auth.sendPasswordResetEmail(email);
-        showMsg('Password reset email sent! Check your inbox (and spam).', 'success');
-      } catch (err) {
-        if (err.code === 'auth/user-not-found') showMsg('No account found with this email.', 'error');
-        else showMsg(err.message || 'Server error.', 'error');
-      }
+        const res = await fetch(API + '/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const data = await res.json();
+        if (data.ok) { showMsg(data.message, 'success'); }
+        else { showMsg(data.error, 'error'); }
+      } catch { showMsg('Could not connect to server.', 'error'); }
       finally { btn.disabled = false; btn.textContent = 'Send Reset Link'; }
     }
 

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "RoLcEmMGPBWFMI9dC18EzupOw662",
+    "name": "Admin User",
+    "email": "ronu09star@gmail.com",
+    "role": "admin"
+  },
+  {
+    "id": "7aXrqnHVUqOAFt8NFLx6Pg8CRZH2",
+    "name": "Staff User",
+    "email": "staff@mahindra.com",
+    "role": "staff"
+  },
+  {
+    "id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
+    "name": "Amit Sharma",
+    "email": "resident1@mahindra.com",
+    "role": "resident"
+  },
+  {
+    "id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
+    "name": "Priya Patel",
+    "email": "resident2@mahindra.com",
+    "role": "resident"
+  },
+  {
+    "id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
+    "name": "Rahul Verma",
+    "email": "resident3@mahindra.com",
+    "role": "resident"
+  },
+  {
+    "id": "EvtfQkcwfCcULUFjmyUaIV0ShY63",
+    "name": "Nimade CHAD",
+    "email": "ronitjaiswal0907@gmail.com",
+    "role": "admin"
+  }
+]

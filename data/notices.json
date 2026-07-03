@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "title": "Water Supply Schedule",
+    "content": "Water supply will be available from 6:00 AM to 8:00 AM and 6:00 PM to 8:00 PM daily.",
+    "posted_by": "Admin",
+    "created_at": "2026-07-03 22:35"
+  },
+  {
+    "id": 2,
+    "title": "Annual Maintenance Fee",
+    "content": "Annual maintenance fee of Rs. 12,000 is due by 31st July. Please pay at the office.",
+    "posted_by": "Admin",
+    "created_at": "2026-07-03 22:35"
+  },
+  {
+    "id": 3,
+    "title": "Security Update",
+    "content": "All residents are requested to use the new RFID tags for gate entry from 1st August.",
+    "posted_by": "Admin",
+    "created_at": "2026-07-03 22:35"
+  },
+  {
+    "id": 4,
+    "title": "Yoga Session",
+    "content": "Free yoga sessions every morning at 6:30 AM in the community park. All ages welcome.",
+    "posted_by": "Admin",
+    "created_at": "2026-07-03 22:35"
+  },
+  {
+    "id": 5,
+    "title": "Garbage Collection",
+    "content": "Garbage collection timings changed to 7:00 AM. Please segregate wet and dry waste.",
+    "posted_by": "Admin",
+    "created_at": "2026-07-03 22:35"
+  }
+]

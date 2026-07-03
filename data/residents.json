@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "user_id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
+    "flat_number": "A-101",
+    "family_members": 3,
+    "occupation": "Service",
+    "phone": "9876543210"
+  },
+  {
+    "id": 2,
+    "user_id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
+    "flat_number": "A-102",
+    "family_members": 3,
+    "occupation": "Service",
+    "phone": "9876543210"
+  },
+  {
+    "id": 3,
+    "user_id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
+    "flat_number": "A-103",
+    "family_members": 3,
+    "occupation": "Service",
+    "phone": "9876543210"
+  }
+]

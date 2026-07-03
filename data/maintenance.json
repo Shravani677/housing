@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "user_id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
+    "month": "05",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-05-15",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 2,
+    "user_id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
+    "month": "06",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-06-18",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 3,
+    "user_id": "BY1MjlTzjcaGfhqJOO6CEgW06Rf2",
+    "month": "07",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "pending",
+    "paid_date": "",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 4,
+    "user_id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
+    "month": "05",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-05-15",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 5,
+    "user_id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
+    "month": "06",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-06-18",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 6,
+    "user_id": "oedLU7kugsdBoaHmjXDP8y6Y1Ny2",
+    "month": "07",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "pending",
+    "paid_date": "",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 7,
+    "user_id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
+    "month": "05",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-05-15",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 8,
+    "user_id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
+    "month": "06",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "paid",
+    "paid_date": "2026-06-18",
+    "created_at": "2026-05-01"
+  },
+  {
+    "id": 9,
+    "user_id": "odhEaAUjCzTCxRHVtjga3gVjZJ93",
+    "month": "07",
+    "year": 2026,
+    "amount": 2500.0,
+    "status": "pending",
+    "paid_date": "",
+    "created_at": "2026-05-01"
+  }
+]
