@@ -52,7 +52,7 @@ def firebase_sign_in(email, password):
     data = resp.json()
     if "idToken" not in data:
         return None, data.get("error", {}).get("message", "Invalid credentials")
-    decoded = admin_auth.verify_id_token(data["idToken"])
+    decoded = admin_auth.verify_id_token(data["idToken"], clock_skew_seconds=10)
     return decoded['uid'], None
 
 def _get_user_by_uid(uid):
