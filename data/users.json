@@ -16,5 +16,11 @@
     "name": "Yash Nimde",
     "email": "yash@test.com",
     "role": "resident"
+  },
+  {
+    "id": "fQAvKyfms1eCSJ6oKN73LeRHMCI2",
+    "name": "Anish Donde",
+    "email": "anish@test.com",
+    "role": "staff"
   }
 ]
