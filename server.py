@@ -1,8 +1,6 @@
-import os, datetime, json, uuid
+import os, datetime, json
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import firebase_admin
-from firebase_admin import credentials, auth as admin_auth
 
 app = Flask(__name__)
 CORS(app, origins='*')
@@ -12,9 +10,6 @@ DATA_DIR = os.path.join(BASE, 'data')
 TEMPLATES_DIR = os.path.join(BASE, 'templates')
 STATIC_DIR = os.path.join(BASE, 'static')
 os.makedirs(DATA_DIR, exist_ok=True)
-
-cred = credentials.Certificate(os.path.join(BASE, 'firebase-key.json'))
-firebase_admin.initialize_app(cred)
 
 FIREBASE_API_KEY = "AIzaSyAEtvIqs0Vw-b8CWU9jSLsUAFANOjbDpEs"
 
@@ -43,17 +38,16 @@ def _next_id(name):
     ids = [x.get('id', 0) for x in items]
     return max(ids) + 1 if ids else 1
 
-# ── Firebase Auth helpers ──────────────────────────────────────────────
+# ── Firebase Auth helpers (REST API only, no Admin SDK) ──────────────────
 
 def firebase_sign_in(email, password):
     import requests
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
     resp = requests.post(url, json={"email": email, "password": password, "returnSecureToken": True})
     data = resp.json()
-    if "idToken" not in data:
+    if "localId" not in data:
         return None, data.get("error", {}).get("message", "Invalid credentials")
-    decoded = admin_auth.verify_id_token(data["idToken"], clock_skew_seconds=10)
-    return decoded['uid'], None
+    return data['localId'], None
 
 def _get_user_by_uid(uid):
     users = _load('users')
@@ -110,14 +104,18 @@ def signup():
     if role not in ('resident', 'staff', 'admin'):
         return jsonify({'ok': False, 'error': 'Invalid role.'}), 400
 
-    try:
-        user = admin_auth.create_user(email=email, password=password, display_name=name)
-    except admin_auth.EmailAlreadyExistsError:
-        return jsonify({'ok': False, 'error': 'Email already registered.'}), 409
-    except Exception as e:
-        return jsonify({'ok': False, 'error': str(e)}), 400
+    import requests
+    resp = requests.post(f'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={FIREBASE_API_KEY}', json={
+        "email": email, "password": password, "returnSecureToken": True
+    })
+    fb = resp.json()
+    if "error" in fb:
+        msg = fb["error"]["message"]
+        if msg == "EMAIL_EXISTS":
+            return jsonify({'ok': False, 'error': 'Email already registered.'}), 409
+        return jsonify({'ok': False, 'error': msg}), 400
 
-    uid = user.uid
+    uid = fb['localId']
     users = _load('users')
     users.append({'id': uid, 'name': name, 'email': email, 'role': role})
     _save('users', users)
