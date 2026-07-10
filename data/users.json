@@ -22,5 +22,11 @@
     "name": "Anish Donde",
     "email": "anish@test.com",
     "role": "staff"
+  },
+  {
+    "id": "5e9AHQjpG9UvUceXAbxyfkMa3p32",
+    "name": "Rohit",
+    "email": "abc123@gmail.com",
+    "role": "resident"
   }
 ]

@@ -14,5 +14,13 @@
     "family_members": 4,
     "occupation": "Engineer",
     "phone": "9867182917"
+  },
+  {
+    "id": 6,
+    "user_id": "5e9AHQjpG9UvUceXAbxyfkMa3p32",
+    "flat_number": "A-13",
+    "family_members": 3,
+    "occupation": "engineer",
+    "phone": "8766245612"
   }
 ]

@@ -3,335 +3,400 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mahindra Gardens – Dashboard</title>
-  <link rel="icon" href="static/logo.jpg" type="image/jpeg">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #F4F5EC; color: #111; }
-    .topbar { background: #fff; border-bottom: 1px solid #E0E1D8; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-    .topbar-left { display: flex; align-items: center; gap: 12px; }
-    .topbar-logo { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-    .topbar-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .topbar h2 { font-size: 17px; font-weight: 700; color: #111; }
-    .topbar-right { display: flex; align-items: center; gap: 20px; }
-    .user-badge { display: flex; align-items: center; gap: 10px; }
-    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: #1E4D31; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; }
-    .user-info { line-height: 1.3; }
-    .user-name { font-size: 13px; font-weight: 600; color: #111; }
-    .user-role { font-size: 11px; color: #666; text-transform: capitalize; }
-    .btn-logout { padding: 7px 18px; background: transparent; border: 1px solid #E0E1D8; border-radius: 50px; color: #666; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .btn-logout:hover { border-color: #1E4D31; color: #1E4D31; }
-    .main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
-    .welcome { margin-bottom: 28px; }
-    .welcome h1 { font-size: 24px; font-weight: 800; color: #111; }
-    .welcome p { font-size: 14px; color: #666; margin-top: 4px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .card { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 24px; }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-    .card-header h3 { font-size: 16px; font-weight: 700; color: #111; }
-    .card-header .count { font-size: 12px; color: #666; background: #F4F5EC; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
-    .card-full { grid-column: 1 / -1; }
-    .notice-item { padding: 14px 0; border-bottom: 1px solid #F0F1E8; }
-    .notice-item:last-child { border-bottom: none; }
-    .notice-title { font-size: 14px; font-weight: 600; color: #111; }
-    .notice-content { font-size: 13px; color: #666; line-height: 1.5; margin-top: 3px; }
-    .notice-meta { font-size: 11px; color: #999; margin-top: 5px; }
-    .event-item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid #F0F1E8; }
-    .event-item:last-child { border-bottom: none; }
-    .event-date-box { min-width: 52px; height: 52px; background: #F4F5EC; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
-    .event-date-day { font-size: 18px; font-weight: 800; color: #1E4D31; }
-    .event-date-mon { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; }
-    .event-info { flex: 1; }
-    .event-title { font-size: 14px; font-weight: 600; color: #111; }
-    .event-desc { font-size: 12px; color: #666; margin-top: 2px; }
-    .event-venue { font-size: 11px; color: #999; margin-top: 3px; }
-    .complaint-form { display: flex; flex-direction: column; gap: 12px; }
-    .mt-card { background: #fff; border: 1px solid #E0E1D8; border-radius: 16px; padding: 0; overflow: hidden; }
-    .mt-status { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; }
-    .mt-status-label { font-size: 14px; font-weight: 600; color: #111; }
-    .mt-status-badge { font-size: 13px; font-weight: 700; padding: 6px 18px; border-radius: 50px; }
-    .mt-status-paid { background: #F0FDF4; color: #15803D; }
-    .mt-status-pending { background: #FEF2F2; color: #B91C1C; }
-    .mt-amount { font-size: 22px; font-weight: 800; color: #111; padding: 0 24px 16px; }
-    .mt-history { border-top: 1px solid #F0F1E8; }
-    .mt-history-header { padding: 14px 24px; font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-    .mt-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; border-top: 1px solid #F0F1E8; font-size: 13px; }
-    .mt-row-month { font-weight: 600; color: #111; }
-    .mt-row-status { font-size: 11px; font-weight: 600; padding: 3px 12px; border-radius: 20px; }
-    .mt-row-date { font-size: 11px; color: #999; }
-    .complaint-form input, .complaint-form textarea { width: 100%; padding: 12px 16px; background: #F8F9F2; border: 1px solid #E0E1D8; border-radius: 12px; font-size: 14px; color: #111; outline: none; transition: all 0.2s; font-family: inherit; }
-    .complaint-form input:focus, .complaint-form textarea:focus { border-color: #1E4D31; background: #fff; }
-    .complaint-form textarea { resize: vertical; min-height: 80px; }
-    .btn { padding: 10px 22px; background: #1E4D31; border: none; border-radius: 50px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-    .btn:hover { background: #163d27; transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-sm { padding: 6px 14px; font-size: 11px; }
-    .btn-outline { background: transparent; border: 1px solid #E0E1D8; color: #666; }
-    .btn-outline:hover { background: #F4F5EC; border-color: #1E4D31; color: #1E4D31; }
-    .complaint-list { margin-top: 14px; }
-    .complaint-item { padding: 12px 0; border-bottom: 1px solid #F0F1E8; }
-    .complaint-item:last-child { border-bottom: none; }
-    .complaint-item-header { display: flex; justify-content: space-between; align-items: center; }
-    .complaint-item-title { font-size: 13px; font-weight: 600; color: #111; }
-    .status-badge { font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; }
-    .status-open { background: #FEF2F2; color: #B91C1C; }
-    .status-in_progress { background: #FFFBEB; color: #A16207; }
-    .status-resolved { background: #F0FDF4; color: #15803D; }
-    .complaint-item-desc { font-size: 12px; color: #666; margin-top: 3px; }
-    .complaint-item-date { font-size: 11px; color: #999; margin-top: 2px; }
-    .fraud-warning { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; font-size: 13px; color: #B91C1C; font-weight: 600; }
-    .fraud-warning.show { display: flex; }
-    .fraud-warning-icon { font-size: 20px; }
-    .message { padding: 10px 14px; border-radius: 12px; font-size: 13px; display: none; text-align: center; margin-top: 12px; }
-    .message.error { display: block; background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
-    .message.success { display: block; background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; }
-    .mt-row-actions { display: flex; gap: 8px; align-items: center; }
-    .btn-invoice { padding: 4px 12px; background: transparent; border: 1px solid #1E4D31; border-radius: 50px; color: #1E4D31; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-    .btn-invoice:hover { background: #1E4D31; color: #fff; }
-    .mt-card-clickable { cursor: pointer; transition: box-shadow 0.2s; }
-    .mt-card-clickable:hover { box-shadow: 0 4px 16px rgba(30,77,49,0.1); }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
-    .modal-overlay.show { display: flex; }
-    .modal { background: #fff; border-radius: 20px; max-width: 520px; width: 100%; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalIn 0.3s ease; position: relative; }
-    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer; }
-    .modal-close:hover { color: #111; }
-    .invoice-header { text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid #F0F1E8; }
-    .invoice-header h2 { font-size: 20px; font-weight: 800; color: #1E4D31; }
-    .invoice-header p { font-size: 12px; color: #666; margin-top: 3px; }
-    .invoice-body { }
-    .invoice-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #F8F9F2; }
-    .invoice-row:last-child { border-bottom: none; }
-    .invoice-label { color: #666; font-weight: 500; }
-    .invoice-value { color: #111; font-weight: 600; }
-    .invoice-total { padding: 12px 0; margin-top: 8px; border-top: 2px solid #1E4D31; font-size: 16px; font-weight: 800; color: #1E4D31; display: flex; justify-content: space-between; }
-    .invoice-actions { display: flex; gap: 12px; margin-top: 20px; }
-    .invoice-actions button { flex: 1; padding: 12px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-    .btn-print { background: #1E4D31; border: none; color: #fff; }
-    .btn-print:hover { background: #163d27; }
-    .btn-print:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-download { background: transparent; border: 1px solid #E0E1D8; color: #666; }
-    .btn-download:hover { border-color: #1E4D31; color: #1E4D31; }
-    @media print {
-      body * { visibility: hidden; }
-      .modal-overlay { position: absolute; background: none; padding: 0; display: block !important; }
-      .modal-overlay.show { display: block !important; }
-      .modal { box-shadow: none; border: 1px solid #ddd; max-width: 100%; animation: none; position: static; margin: 20px auto; }
-      .modal, .modal * { visibility: visible; }
-      .modal-close, .invoice-actions, .mt-card-clickable { display: none !important; }
-    }
-    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .topbar { padding: 12px 16px; } .main { padding: 16px; } }
-  </style>
+  <meta name="description" content="Mahindra Gardens Resident Portal - Manage your notices, complaints and maintenance payments.">
+  <title>Resident Dashboard - Mahindra Gardens</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="topbar-logo"><img src="static/logo.jpg" alt="MG"></div>
-      <h2>Mahindra Gardens</h2>
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-area">
+      <img src="/static/logo.jpg" alt="Logo" onerror="this.src='https://ui-avatars.com/api/?name=MG&background=4F46E5&color=fff'">
+      <h2>Mahindra<br>Gardens</h2>
     </div>
-    <div class="topbar-right">
-      <div class="user-badge">
-        <div class="user-avatar" id="avatarLetter">R</div>
-        <div class="user-info">
-          <div class="user-name" id="userName">Resident</div>
-          <div class="user-role" id="userRole">resident</div>
+
+    <div class="nav-links">
+      <a class="nav-link active" data-target="view-dashboard" data-tooltip="Dashboard">
+        <i data-feather="grid"></i><span class="nav-text">Dashboard</span>
+      </a>
+      <a class="nav-link" data-target="view-notices" data-tooltip="Notice Board">
+        <i data-feather="bell"></i><span class="nav-text">Notice Board</span>
+      </a>
+      <a class="nav-link" data-target="view-complaints" data-tooltip="Complaints">
+        <i data-feather="message-square"></i><span class="nav-text">Complaints</span>
+      </a>
+      <a class="nav-link" data-target="view-maintenance" data-tooltip="Maintenance">
+        <i data-feather="credit-card"></i><span class="nav-text">Maintenance</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <a class="sidebar-control" id="themeToggle" data-tooltip="Toggle Theme">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <i data-feather="moon" id="themeIcon"></i>
+          <span class="nav-text">Dark Mode</span>
+        </div>
+      </a>
+      <a class="sidebar-control" id="collapseToggle" data-tooltip="Collapse">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <i data-feather="chevron-left" id="collapseIcon"></i>
+          <span class="nav-text">Collapse Menu</span>
+        </div>
+      </a>
+      <a class="nav-link logout" id="logoutBtn" data-tooltip="Sign Out">
+        <i data-feather="log-out"></i><span class="nav-text">Sign Out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">
+        <i data-feather="menu"></i>
+      </button>
+      <div class="topbar-right">
+        <div class="user-profile">
+          <div class="avatar" id="avatarLetter">R</div>
+          <div class="user-details">
+            <span class="user-name" id="userName">Resident</span>
+            <span class="user-role" id="userRole">resident</span>
+          </div>
         </div>
       </div>
-      <button class="btn-logout" id="logoutBtn">Sign Out</button>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+
+      <!-- ====== VIEW: DASHBOARD ====== -->
+      <div id="view-dashboard" class="view-section active">
+
+        <!-- Welcome Hero -->
+        <div class="welcome-section">
+          <div class="welcome-bg"></div>
+          <div class="welcome-text">
+            <h1>Welcome back, <span id="greetingName">Resident</span>!</h1>
+            <p>Here's what's happening in your society today.</p>
+          </div>
+          <div class="flat-badge">
+            <span>Apartment</span>
+            <strong id="flatNumberBadge">----</strong>
+          </div>
+        </div>
+
+        <!-- Fraud Warning (hidden by default) -->
+        <div class="fraud-warning" id="fraudWarning">
+          <i data-feather="alert-triangle"></i>
+          <span>Your complaint "<span id="fraudTitle"></span>" was flagged as fraudulent. Repeated violations may lead to account suspension.</span>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i data-feather="bell"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="noticeCount">—</span>
+              <span class="stat-label">Total Notices</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow"><i data-feather="calendar"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="eventCount">—</span>
+              <span class="stat-label">Upcoming Events</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><i data-feather="alert-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="activeComplaintCount">—</span>
+              <span class="stat-label">Active Tickets</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Grid -->
+        <div class="main-grid">
+
+          <!-- Left Column -->
+          <div style="display:flex;flex-direction:column;gap:32px;">
+
+            <!-- Current Maintenance Card -->
+            <div class="card mt-card" id="maintenanceCard">
+              <div class="card-header" style="margin-bottom:0;">
+                <div class="card-title">
+                  <i data-feather="credit-card" style="color:var(--primary)"></i> Current Maintenance
+                </div>
+                <span class="mt-status-badge" id="mtBadge">Loading…</span>
+              </div>
+              <div style="margin-top:16px;">
+                <div class="mt-desc">Maintenance dues for the current month.</div>
+                <div class="mt-amount" id="mtAmount">—</div>
+              </div>
+            </div>
+
+            <!-- Recent Notices Preview -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i data-feather="clipboard" style="color:var(--primary)"></i> Recent Notices</div>
+                <button class="btn btn-outline" style="height:36px;padding:0 16px;border-radius:8px;" onclick="switchTab('view-notices')">View All</button>
+              </div>
+              <div class="list-container" id="dashboardNoticeList">
+                <!-- Skeleton -->
+                <div class="list-item"><div class="skel-line skeleton" style="height:56px;width:56px;border-radius:14px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><div class="skel-line skeleton w-75"></div><div class="skel-line skeleton w-50"></div></div></div>
+                <div class="list-item"><div class="skel-line skeleton" style="height:56px;width:56px;border-radius:14px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;"><div class="skel-line skeleton w-75"></div><div class="skel-line skeleton w-50"></div></div></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column -->
+          <div style="display:flex;flex-direction:column;gap:32px;">
+
+            <!-- Help Desk Preview -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i data-feather="message-square" style="color:var(--primary)"></i> Help Desk</div>
+                <button class="btn btn-outline" style="height:36px;padding:0 16px;border-radius:8px;" onclick="switchTab('view-complaints')">Manage</button>
+              </div>
+              <div style="margin-bottom:16px;">
+                <button class="btn" style="width:100%;" onclick="openComplaintModal()">
+                  <i data-feather="plus"></i> Raise New Ticket
+                </button>
+              </div>
+              <div class="list-container" id="dashboardComplaintList">
+                <div class="skel-line skeleton" style="height:64px;border-radius:12px;margin-bottom:8px;"></div>
+                <div class="skel-line skeleton" style="height:64px;border-radius:12px;margin-bottom:8px;"></div>
+              </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><i data-feather="calendar" style="color:var(--primary)"></i> Upcoming Events</div>
+              </div>
+              <div class="list-container" id="eventList">
+                <div class="skel-line skeleton" style="height:56px;border-radius:12px;margin-bottom:8px;"></div>
+                <div class="skel-line skeleton" style="height:56px;border-radius:12px;margin-bottom:8px;"></div>
+              </div>
+            </div>
+
+            <!-- Payment History (Dashboard preview) -->
+            <div style="padding-bottom:16px;">
+              <div class="mt-history-header">
+                <i data-feather="clock" style="color:var(--text-muted);width:18px;"></i> Payment History
+              </div>
+              <div id="mtHistoryList">
+                <div class="skel-line skeleton" style="height:56px;border-radius:12px;margin-bottom:12px;"></div>
+                <div class="skel-line skeleton" style="height:56px;border-radius:12px;margin-bottom:12px;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- END: DASHBOARD -->
+
+
+      <!-- ====== VIEW: NOTICES ====== -->
+      <div id="view-notices" class="view-section">
+        <div class="module-header">
+          <div class="module-title">
+            <i data-feather="bell" style="width:28px;height:28px;color:var(--primary)"></i> Notice Board
+          </div>
+          <div class="module-actions">
+            <div class="search-bar">
+              <i data-feather="search" style="color:var(--text-muted);width:18px;"></i>
+              <input type="text" id="noticeSearch" placeholder="Search notices…" aria-label="Search notices">
+            </div>
+            <select class="filter-dropdown" id="noticeFilter" aria-label="Filter by category">
+              <option value="All">All Categories</option>
+              <option value="General">General</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="notice-grid" id="fullNoticeGrid">
+          <!-- Skeleton -->
+          <div class="skel-card"><div class="skel-line skeleton w-50"></div><div class="skel-line skeleton" style="margin-top:16px;"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton w-75"></div></div>
+          <div class="skel-card"><div class="skel-line skeleton w-50"></div><div class="skel-line skeleton" style="margin-top:16px;"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton w-75"></div></div>
+          <div class="skel-card"><div class="skel-line skeleton w-50"></div><div class="skel-line skeleton" style="margin-top:16px;"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton w-75"></div></div>
+        </div>
+      </div>
+      <!-- END: NOTICES -->
+
+
+      <!-- ====== VIEW: COMPLAINTS ====== -->
+      <div id="view-complaints" class="view-section">
+        <div class="module-header">
+          <div class="module-title">
+            <i data-feather="message-square" style="width:28px;height:28px;color:var(--primary)"></i> Help Desk Tickets
+          </div>
+          <div class="module-actions">
+            <div class="search-bar">
+              <i data-feather="search" style="color:var(--text-muted);width:18px;"></i>
+              <input type="text" id="complaintSearch" placeholder="Search tickets…" aria-label="Search tickets">
+            </div>
+            <select class="filter-dropdown" id="complaintFilter" aria-label="Filter by status">
+              <option value="All">All Statuses</option>
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+            <button class="btn" onclick="openComplaintModal()">
+              <i data-feather="plus"></i> New Ticket
+            </button>
+          </div>
+        </div>
+        <div class="complaint-board-list" id="fullComplaintList">
+          <!-- Skeleton -->
+          <div class="skel-card" style="height:140px;"><div class="skel-line skeleton w-50"></div><div class="skel-line skeleton" style="margin-top:16px;"></div><div class="skel-line skeleton w-75" style="margin-top:16px;"></div></div>
+          <div class="skel-card" style="height:140px;"><div class="skel-line skeleton w-50"></div><div class="skel-line skeleton" style="margin-top:16px;"></div><div class="skel-line skeleton w-75" style="margin-top:16px;"></div></div>
+        </div>
+      </div>
+      <!-- END: COMPLAINTS -->
+
+
+      <!-- ====== VIEW: MAINTENANCE ====== -->
+      <div id="view-maintenance" class="view-section">
+        <div class="module-header">
+          <div class="module-title">
+            <i data-feather="credit-card" style="width:28px;height:28px;color:var(--primary)"></i> Maintenance & Billing
+          </div>
+        </div>
+
+        <div class="mt-hero-grid">
+          <!-- Current Dues Hero Card -->
+          <div class="mt-summary-card" id="mtFullSummary">
+            <div class="mt-summary-bg"></div>
+            <div class="mt-summary-header">
+              <span class="mt-summary-title">Loading…</span>
+            </div>
+            <div class="mt-summary-body">
+              <div class="mt-summary-amount">—</div>
+            </div>
+          </div>
+
+          <!-- Billing Info -->
+          <div class="mt-info-card">
+            <h3 style="font-size:18px;font-weight:700;color:var(--text-main);margin-bottom:24px;">Billing Information</h3>
+            <div class="mt-info-row">
+              <span class="mt-info-label">Resident Name</span>
+              <span class="mt-info-value" id="billingName">—</span>
+            </div>
+            <div class="mt-info-row">
+              <span class="mt-info-label">Apartment</span>
+              <span class="mt-info-value" id="billingFlat">—</span>
+            </div>
+            <div class="mt-info-row">
+              <span class="mt-info-label">Members</span>
+              <span class="mt-info-value" id="billingMembers">—</span>
+            </div>
+            <div class="mt-info-row">
+              <span class="mt-info-label">Billing Cycle</span>
+              <span class="mt-info-value">Monthly</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size:20px;font-weight:700;color:var(--text-main);margin-bottom:20px;">Payment History</h3>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Period</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Paid On</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="fullMtTableBody">
+              <tr><td colspan="6" style="text-align:center;padding:40px;"><div class="skel-line skeleton" style="margin:0 auto;max-width:300px;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- END: MAINTENANCE -->
+
     </div>
   </div>
 
-  <div class="main">
-    <div class="welcome">
-      <h1>Good evening, <span id="greetingName">Resident</span> &#x1F44B;</h1>
-      <p>Here's what's happening in your society today.</p>
-    </div>
-    <div class="fraud-warning" id="fraudWarning">
-      <span class="fraud-warning-icon">&#x26A0;&#xFE0F;</span>
-      <span id="fraudWarningText">Your complaint "<span id="fraudTitle"></span>" has been flagged as fraudulent. Repeated violations may lead to account suspension.</span>
-    </div>
-    <div class="grid">
-      <div class="card card-full">
-        <div class="card-header">
-          <h3>&#x1F4E2; Notice Board</h3>
-          <span class="count" id="noticeCount">0</span>
-        </div>
-        <div id="noticeList"></div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3>&#x1F4C5; Upcoming Events</h3>
-          <span class="count" id="eventCount">0</span>
-        </div>
-        <div id="eventList"></div>
-      </div>
-      <div class="mt-card" id="maintenanceCard">
-        <div class="mt-status">
-          <span class="mt-status-label">&#x1F3E1; This Month Maintenance</span>
-          <span class="mt-status-badge" id="mtBadge">Loading...</span>
-        </div>
-        <div class="mt-amount" id="mtAmount"></div>
-        <div class="mt-history" id="mtHistory">
-          <div class="mt-history-header">Payment History</div>
-          <div id="mtHistoryList"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <h3>&#x1F4AC; Raise a Complaint</h3>
-        </div>
-        <form class="complaint-form" id="complaintForm">
-          <input type="text" id="complaintTitle" placeholder="Subject" required>
-          <textarea id="complaintDesc" placeholder="Describe your issue in detail" required></textarea>
-          <button type="submit" class="btn">Submit Complaint</button>
-        </form>
-        <div class="message" id="complaintMessage"></div>
-        <div class="complaint-list" id="complaintList"></div>
-      </div>
-    </div>
-  </div>
+  <!-- ========== MODALS ========== -->
 
-  <div class="modal-overlay" id="invoiceModal">
+  <!-- Notice Detail Modal -->
+  <div class="modal-overlay" id="noticeModal">
     <div class="modal">
-      <button class="modal-close" id="invoiceClose">&times;</button>
+      <button class="modal-close" onclick="closeModal('noticeModal')" aria-label="Close"><i data-feather="x"></i></button>
+      <div class="modal-header">
+        <span class="category-badge" id="modalNoticeBadge" style="margin-bottom:12px;">Category</span>
+        <h2 class="modal-title" id="modalNoticeTitle">—</h2>
+        <div class="modal-subtitle">
+          <i data-feather="calendar" style="width:14px;height:14px;margin-right:4px;"></i>
+          <span id="modalNoticeDate">—</span> &middot; <span id="modalNoticeAuthor">—</span>
+        </div>
+      </div>
+      <div class="modal-body" id="modalNoticeContent" style="white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
+  <!-- Raise Complaint Modal -->
+  <div class="modal-overlay" id="createComplaintModal">
+    <div class="modal modal-sm">
+      <button class="modal-close" onclick="closeModal('createComplaintModal')" aria-label="Close"><i data-feather="x"></i></button>
+      <div class="modal-header">
+        <h2 class="modal-title">Raise New Ticket</h2>
+        <div class="modal-subtitle">Our team will resolve your issue as soon as possible.</div>
+      </div>
+      <form id="modalComplaintForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="modalComplaintTitle">Issue Title</label>
+          <input type="text" class="input-field" id="modalComplaintTitle" placeholder="e.g. Plumbing issue in washroom" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modalComplaintDesc">Detailed Description</label>
+          <textarea class="input-field" id="modalComplaintDesc" placeholder="Describe the issue in detail…" required></textarea>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:32px;">
+          <button type="button" class="btn btn-outline" style="flex:1;" onclick="closeModal('createComplaintModal')">Cancel</button>
+          <button type="submit" class="btn" id="modalComplaintSubmit" style="flex:1;">Submit Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Invoice Modal -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal modal-sm">
+      <button class="modal-close" onclick="closeModal('invoiceModal')" aria-label="Close"><i data-feather="x"></i></button>
       <div class="invoice-header">
         <h2>Mahindra Gardens</h2>
-        <p>Sector 62, Noida &middot; Maintenance Invoice</p>
+        <p>Resident Maintenance Invoice</p>
       </div>
-      <div class="invoice-body" id="invoiceBody"></div>
+      <div id="invoiceBody"></div>
       <div class="invoice-actions">
-        <button class="btn-download" id="invoiceDownload" disabled>Download PDF</button>
-        <button class="btn-print" id="invoicePrint">Print Invoice</button>
+        <button class="btn-download" disabled>Download PDF</button>
+        <button class="btn-print" id="invoicePrint"><i data-feather="printer"></i> Print</button>
       </div>
     </div>
   </div>
 
-  <script>
-    const API = 'http://localhost:5000/api';
-    let user = null;
+  <!-- ========== TOAST CONTAINER ========== -->
+  <div class="toast-container" id="toastContainer"></div>
 
-    function getUser() {
-      const raw = sessionStorage.getItem('user');
-      if (!raw) { window.location.href = 'login.html'; return null; }
-      return JSON.parse(raw);
-    }
-
-    function render() {
-      user = getUser(); if (!user) return;
-      document.getElementById('avatarLetter').textContent = user.name[0];
-      document.getElementById('userName').textContent = user.name;
-      document.getElementById('userRole').textContent = user.role;
-      document.getElementById('greetingName').textContent = user.name.split(' ')[0];
-      loadNotices(); loadEvents(); loadComplaints(); loadMaintenance(); loadFraudWarnings();
-    }
-
-    async function loadNotices() {
-      const r = await fetch(API + '/notices'); const list = await r.json();
-      document.getElementById('noticeCount').textContent = list.length;
-      document.getElementById('noticeList').innerHTML = list.map(n =>
-        `<div class="notice-item"><div class="notice-title">${esc(n.title)}</div><div class="notice-content">${esc(n.content)}</div><div class="notice-meta">Posted by ${esc(n.posted_by)} &middot; ${n.created_at}</div></div>`
-      ).join('');
-    }
-
-    async function loadEvents() {
-      const r = await fetch(API + '/events'); const list = await r.json();
-      document.getElementById('eventCount').textContent = list.length;
-      document.getElementById('eventList').innerHTML = list.map(e => {
-        const d = new Date(e.event_date + 'T00:00:00');
-        return `<div class="event-item"><div class="event-date-box"><div class="event-date-day">${d.getDate()}</div><div class="event-date-mon">${d.toLocaleString('en',{month:'short'})}</div></div><div class="event-info"><div class="event-title">${esc(e.title)}</div><div class="event-desc">${esc(e.description)}</div><div class="event-venue">${e.venue ? '📍 ' + esc(e.venue) : ''}</div></div></div>`;
-      }).join('');
-    }
-
-    async function loadComplaints() {
-      const r = await fetch(API + '/complaints?user_id=' + user.id); const list = await r.json();
-      document.getElementById('complaintList').innerHTML = list.map(c =>
-        `<div class="complaint-item"><div class="complaint-item-header"><div class="complaint-item-title">${esc(c.title)}</div><span class="status-badge status-${c.status}">${c.status.replace('_',' ')}</span></div><div class="complaint-item-desc">${esc(c.description)}</div><div class="complaint-item-date">${c.created_at}</div></div>`
-      ).join('');
-    }
-
-    document.getElementById('complaintForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const title = document.getElementById('complaintTitle').value.trim();
-      const desc = document.getElementById('complaintDesc').value.trim();
-      if (!title || !desc) return;
-      const btn = document.querySelector('#complaintForm .btn'); btn.disabled = true; btn.textContent = 'Submitting...';
-      try {
-        const r = await fetch(API + '/complaints', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: user.id, user_name: user.name, title, description: desc }) });
-        const d = await r.json();
-        if (d.ok) { document.getElementById('complaintForm').reset(); showMsg('Complaint submitted!', 'success'); loadComplaints(); } else { showMsg(d.error, 'error'); }
-      } catch { showMsg('Server error.', 'error'); }
-      finally { btn.disabled = false; btn.textContent = 'Submit Complaint'; }
-    });
-
-    async function loadMaintenance() {
-      const r = await fetch(API + '/maintenance/current?user_id=' + user.id);
-      const row = await r.json();
-      const badge = document.getElementById('mtBadge');
-      const amt = document.getElementById('mtAmount');
-      const card = document.getElementById('maintenanceCard');
-      if (row && row.id) {
-        badge.textContent = row.status === 'paid' ? 'Paid' : 'Pending';
-        badge.className = 'mt-status-badge mt-status-' + row.status;
-        amt.textContent = '₹' + row.amount.toLocaleString();
-        card.classList.add('mt-card-clickable');
-        card.onclick = () => showInvoice(row);
-      } else {
-        badge.textContent = 'No Record';
-        badge.className = 'mt-status-badge';
-        badge.style.background = '#F4F5EC'; badge.style.color = '#666';
-        amt.textContent = '';
-        card.classList.remove('mt-card-clickable');
-        card.onclick = null;
-      }
-      const r2 = await fetch(API + '/maintenance?user_id=' + user.id);
-      const all = await r2.json();
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      document.getElementById('mtHistoryList').innerHTML = all.length
-        ? all.map(m => `<div class="mt-row"><span class="mt-row-month">${months[parseInt(m.month)-1]} ${m.year}</span><span class="mt-row-status mt-status-${m.status}">${m.status === 'paid' ? 'Paid' : 'Pending'}</span><span class="mt-row-actions"><span class="mt-row-date">${m.paid_date || '-'}</span><button class="btn-invoice" onclick='showInvoice(${JSON.stringify(m).replace(/'/g,"&#39;")})'>Invoice</button></span></div>`).join('')
-        : '<div class="mt-row" style="color:#999;justify-content:center">No records found</div>';
-    }
-
-    function showInvoice(m) {
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const statusText = m.status === 'paid' ? 'Paid' : 'Pending';
-      const invNo = 'INV-' + m.year + '-' + m.month + '-' + String(m.user_id).padStart(3,'0');
-      document.getElementById('invoiceBody').innerHTML = `
-        <div class="invoice-row"><span class="invoice-label">Invoice No.</span><span class="invoice-value">${invNo}</span></div>
-        <div class="invoice-row"><span class="invoice-label">Resident</span><span class="invoice-value">${esc(m.name || user.name)}</span></div>
-        <div class="invoice-row"><span class="invoice-label">Flat Number</span><span class="invoice-value">${m.flat_number || '-'}</span></div>
-        <div class="invoice-row"><span class="invoice-label">Period</span><span class="invoice-value">${months[parseInt(m.month)-1]} ${m.year}</span></div>
-        <div class="invoice-row"><span class="invoice-label">Status</span><span class="invoice-value" style="color:${m.status === 'paid' ? '#15803D' : '#B91C1C'}">${statusText}</span></div>
-        ${m.paid_date ? `<div class="invoice-row"><span class="invoice-label">Paid On</span><span class="invoice-value">${m.paid_date}</span></div>` : ''}
-        <div class="invoice-total"><span>Total Amount</span><span>₹${Number(m.amount).toLocaleString()}</span></div>
-        <div style="text-align:center;margin-top:12px;font-size:11px;color:#999">${m.status === 'paid' ? '&#x2705; This invoice has been paid. Thank you!' : '&#x23F0; Payment pending. Please pay before the due date.'}</div>
-      `;
-      document.getElementById('invoiceModal').classList.add('show');
-    }
-
-    async function loadFraudWarnings() {
-      try {
-        const r = await fetch(API + '/complaints?warnings=1&user_id=' + user.id);
-        const warnings = await r.json();
-        const el = document.getElementById('fraudWarning');
-        const titleEl = document.getElementById('fraudTitle');
-        if (warnings.length) {
-          titleEl.textContent = warnings[0].title;
-          el.classList.add('show');
-        } else {
-          el.classList.remove('show');
-        }
-      } catch {}
-    }
-
-    document.getElementById('invoiceClose').addEventListener('click', () => document.getElementById('invoiceModal').classList.remove('show'));
-    document.getElementById('invoiceModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
-    document.getElementById('invoicePrint').addEventListener('click', () => window.print());
-
-    document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('user'); window.location.href = 'login.html'; });
-    function showMsg(text, type) { const el = document.getElementById('complaintMessage'); el.textContent = text; el.className = 'message ' + type; setTimeout(() => el.className = 'message', 3000); }
-    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-    render();
-  </script>
+  <!-- External App Script -->
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
